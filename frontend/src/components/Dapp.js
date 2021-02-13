@@ -1,4 +1,5 @@
 import React from "react";
+import axios from 'axios';
 
 // We'll use ethers to interact with the Ethereum network and our contract
 import { ethers } from "ethers";
@@ -161,6 +162,10 @@ export class Dapp extends React.Component {
     );
   }
 
+  componentDidMount(){
+      this.testAuthentication();
+  }
+
   componentWillUnmount() {
     // We poll the user's balance, so we have to stop doing that when Dapp
     // gets unmounted
@@ -204,6 +209,23 @@ export class Dapp extends React.Component {
       this._resetState();
     });
   }
+
+testAuthentication = () => {
+    const url = `https://api.pinata.cloud/data/testAuthentication`;
+    return axios
+        .get(url, {
+            headers: {
+                pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
+                pinata_secret_api_key: process.env.REACT_APP_PINATA_SECRET_KEY
+            }
+        })
+        .then(function (response) {
+            console.log(response)
+        })
+        .catch(function (error) {
+            console.log(error)
+        });
+};
 
   _initialize(userAddress) {
     // This method initializes the dapp
