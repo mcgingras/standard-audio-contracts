@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { Dapp } from "./components/Dapp";
 import Form from './components/Form';
+import Home from './components/Home';
 
 const App = () => {
   return (
@@ -15,8 +16,11 @@ const App = () => {
           <Route path="/new">
             <Form />
           </Route>
-          <Route path="/">
+          <Route path="/dapp">
             <Dapp />
+          </Route>
+          <Route path="/">
+            <Home />
           </Route>
         </Switch>
       </div>
