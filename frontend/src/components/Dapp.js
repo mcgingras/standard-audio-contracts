@@ -210,23 +210,6 @@ export class Dapp extends React.Component {
     });
   }
 
-testAuthentication = () => {
-    const url = `https://api.pinata.cloud/data/testAuthentication`;
-    return axios
-        .get(url, {
-            headers: {
-                pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
-                pinata_secret_api_key: process.env.REACT_APP_PINATA_SECRET_KEY
-            }
-        })
-        .then(function (response) {
-            console.log(response)
-        })
-        .catch(function (error) {
-            console.log(error)
-        });
-};
-
   _initialize(userAddress) {
     // This method initializes the dapp
 

@@ -9,16 +9,16 @@ export function ConnectWallet({ connectWallet, networkError, dismiss }) {
         <div className="col-12 text-center">
           {/* Metamask network should be set to Localhost:8545. */}
           {networkError && (
-            <NetworkErrorMessage 
-              message={networkError} 
-              dismiss={dismiss} 
+            <NetworkErrorMessage
+              message={networkError}
+              dismiss={dismiss}
             />
           )}
         </div>
         <div className="col-6 p-4 text-center">
           <p>Please connect to your wallet.</p>
           <button
-            className="btn btn-warning"
+            className="px-4 py-2 rounded-md bg-yellow-500 mt-4"
             type="button"
             onClick={connectWallet}
           >

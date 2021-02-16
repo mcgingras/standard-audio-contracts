@@ -1,30 +1,26 @@
 import React, {useEffect, useState} from "react";
+const axios = require('axios');
 
-// We could probably make this a hook instead but ah its fine for no
+// We could probably make this a hook instead but ah its fine for now
 function useDebounce(value, delay) {
-    // State and setters for debounced value
     const [debouncedValue, setDebouncedValue] = useState(value);
 
     useEffect(
       () => {
-        // Update debounced value after delay
         const handler = setTimeout(() => {
           setDebouncedValue(value);
         }, delay);
 
-        // Cancel the timeout if value changes (also on delay change or unmount)
-        // This is how we prevent debounced value from updating if value is changed ...
-        // .. within the delay period. Timeout gets cleared and restarted.
         return () => {
           clearTimeout(handler);
         };
       },
-      [value, delay] // Only re-call effect if value or delay changes
+      [value, delay]
     );
 
     return debouncedValue;
-
 }
+
 const Home = () => {
     const [token, setToken] = useState('');
     const [isLoggedIn, setLoggedIn] = useState(false);
@@ -72,34 +68,77 @@ const Home = () => {
         [debouncedQuery] // Only call effect if debounced search term changes
       );
 
+      const addSong = (song) => {
+          setQuery("");
+          let songData = {
+              id: song.id,
+              name: song.name
+          }
+          setSongs([...songs, songData])
+      }
+
     return (
         <div className="container mx-auto">
             Mixtape NFT
             { !isLoggedIn ? <a href="http://localhost:8888/login">login to spotify</a> :
             <div>
-                <input
-                className="border-l border-t border-r mt-2 w-full rounded-t-lg px-4 py-2"
-                type="text"
-                placeholder="Search Spotify"
-                onChange={e => setQuery(e.target.value)}
-                />
-                {isSearching && <div>Searching ...</div>}
-                <div className="border rounded-b-lg">
-                    {tracks.map(result => (
-                    <div key={result.id} onClick={() => {setSongs([...songs, result.id])}} className="hover:bg-gray-200 w-full px-4 py-1">
-                        <h4>{result.name} - {result.artists.map((artist) => artist.name)}</h4>
+                <form onSubmit={(event) => {
+                    event.preventDefault();
+
+                    const formData = new FormData(event.target);
+                    const value = Object.fromEntries(formData.entries());
+                    console.log(value);
+                    pinJSONToIPFS(value);
+                }}>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Title</label>
+                        <input type="text" name="title" className="border shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
+                    </div>
+                    <label className="block text-sm font-medium text-gray-700">Songs</label>
+                    <input
+                    className="border-l border-t border-r w-full rounded-t-lg px-4 py-2"
+                    type="text"
+                    placeholder="Search Spotify"
+                    value={query}
+                    onChange={e => setQuery(e.target.value)}
+                    />
+                    {isSearching && <div>Searching ...</div>}
+                    <div className="border rounded-b-lg">
+                        {tracks.map(result => (
+                        <div key={result.id} onClick={() => addSong(result)} className="hover:bg-gray-200 w-full px-4 py-1">
+                            <h4>{result.name} - {result.artists.map((artist) => artist.name)}</h4>
+                        </div>
+                        ))}
+                    </div>
+                    {songs.map((result, index) => (
+                    <div key={result.id} className="w-full px-4 py-1">
+                        {result.name}
+                        <input type="hidden" name={`song-${index}`} value={result.id} />
                     </div>
                     ))}
-                </div>
+                    <button type="submit">submit</button>
+                </form>
             </div>
             }
-            {songs.map(result => (
-                <div key={result.id} className="hover:bg-gray-200 w-full px-4 py-1">
-                    selected song....
-                </div>
-            ))}
         </div>
     )
 }
+
+const pinJSONToIPFS = (JSONBody) => {
+    const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+    return axios
+        .post(url, JSONBody, {
+            headers: {
+                pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
+                pinata_secret_api_key: process.env.REACT_APP_PINATA_SECRET_KEY
+            }
+        })
+        .then(function (response) {
+            console.log(response)
+        })
+        .catch(function (error) {
+            console.log(error)
+        });
+};
 
 export default Home;
