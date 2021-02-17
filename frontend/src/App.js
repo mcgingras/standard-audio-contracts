@@ -17,6 +17,7 @@ import { ConnectWallet } from "./components/ConnectWallet";
 
 const App = () => {
     const [address, setAdress] = useState(null);
+    const [contract, setContract] = useState(null);
 
       const _connectWallet = async () => {
         const [selectedAddress] = await window.ethereum.enable();
@@ -31,8 +32,6 @@ const App = () => {
      const _intializeEthers = async () => {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
 
-        // set state and set this as context
-        // maybe along with some web3 or ethers or account info?
         const mixtape = new ethers.Contract(
           contractAddress.Mixtape,
           MixtapeArtifact.abi,
@@ -40,6 +39,7 @@ const App = () => {
         );
 
         console.log(mixtape);
+        setContract(mixtape);
       }
 
     if (window.ethereum === undefined) {
@@ -62,7 +62,7 @@ const App = () => {
                     <Dapp />
                 </Route>
                 <Route path="/">
-                    <Home />
+                    <Home contract={contract} />
                 </Route>
                 </Switch>
             </div>

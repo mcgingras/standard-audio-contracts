@@ -162,10 +162,6 @@ export class Dapp extends React.Component {
     );
   }
 
-  componentDidMount(){
-      this.testAuthentication();
-  }
-
   componentWillUnmount() {
     // We poll the user's balance, so we have to stop doing that when Dapp
     // gets unmounted
