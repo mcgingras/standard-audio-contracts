@@ -1,40 +1,67 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
+import axios from 'axios';
 
-// displays collection of mixtapes
-export class Shelf extends React.Component {
-    constructor(props) {
-        super(props);
+const getIPFSData = (hash) => {
+    const url = `https://gateway.ipfs.io/ipfs/${hash}`
+    return axios
+    .get(url)
+    .then(function (response) {
+        return response;
+    })
+    .catch(function (error) {
+        console.log(error)
+    });
+};
 
-        this.state = {
-            mixes: undefined
+const Shelf = ({contract}) => {
+    const [mixes, setMixes] = useState([]);
+
+    const fetchNFTs = async () => {
+        try {
+          const total = await contract.totalSupply();
+          let uriList = [];
+          let i = 0;
+          for (i = 0; i < total; i++) {
+              let tokenID = await contract.tokenByIndex(i);
+              let uri = await contract.tokenURI(tokenID);
+              let response = await getIPFSData(uri);
+              uriList.push(response.data);
+          }
+
+          console.log(uriList);
+          return uriList;
+        } catch (error) {
+          console.log(error);
         }
     }
 
-    async componentWillMount() {
-        const uriList = await this.props.fetch();
-        this.setState({
-            mixes: uriList
-        })
-    }
+    useEffect(() => {
+        async function fetchData(){
+            let mixes = await fetchNFTs();
+            console.log(mixes)
+            setMixes(mixes);
+        }
+        if (contract != null) {
+            fetchData();
+        }
+    }, [contract])
 
-    render() {
-        return (
-            <div>
-                <h4>Browse Mixtapes</h4>
-                <div className="flex">
-                    {
-                        this.state.mixes !== undefined && (
-                            this.state.mixes.map((uri) => {
-                                return (
-                                    <div className="" key={uri}>
-                                        {uri}
-                                    </div>
-                                )
-                            })
+    return (
+        <div className="container mx-auto">
+            <h4 className="text-xl font-bold">Browse Mixtapes</h4>
+            <div className="flex">
+                {
+                    mixes.map((mixData) => {
+                        return (
+                            <div className="" key={mixData.title}>
+                                {mixData.title}
+                            </div>
                         )
-                    }
-                </div>
+                    })
+                }
             </div>
-        );
-    }
+        </div>
+    )
 }
+
+export default Shelf;

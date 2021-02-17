@@ -18,13 +18,10 @@ const Home = ({contract}) => {
 
     const mintToken = async (to, uri) => {
         try {
-              console.log("we are minting the token");
               const tx = await contract.createMixtape(to, uri);
               setTxHash(tx.hash);
-              console.log(tx);
 
               const receipt = await tx.wait();
-              console.log(receipt);
                 if (receipt.status === 0) {
                     throw new Error("Transaction failed");
                 }

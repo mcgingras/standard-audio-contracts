@@ -11,6 +11,7 @@ import contractAddress from "./contracts/contract-address.json";
 
 import { Dapp } from "./components/Dapp";
 import Home from './components/Home';
+import Shelf  from "./components/Shelf";
 import { NoWalletDetected } from "./components/NoWalletDetected";
 import { ConnectWallet } from "./components/ConnectWallet";
 
@@ -38,7 +39,6 @@ const App = () => {
           provider.getSigner(0)
         );
 
-        console.log(mixtape);
         setContract(mixtape);
       }
 
@@ -58,12 +58,15 @@ const App = () => {
         <Router>
             <div>
                 <Switch>
-                <Route path="/dapp">
-                    <Dapp />
-                </Route>
-                <Route path="/">
-                    <Home contract={contract} />
-                </Route>
+                    <Route path="/dapp">
+                        <Dapp />
+                    </Route>
+                    <Route path="/shelf">
+                        <Shelf contract={contract} />
+                    </Route>
+                    <Route path="/">
+                        <Home contract={contract} />
+                    </Route>
                 </Switch>
             </div>
         </Router>

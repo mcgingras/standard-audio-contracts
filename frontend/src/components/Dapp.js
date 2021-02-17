@@ -1,5 +1,4 @@
 import React from "react";
-import axios from 'axios';
 
 // We'll use ethers to interact with the Ethereum network and our contract
 import { ethers } from "ethers";
@@ -17,8 +16,6 @@ import { ConnectWallet } from "./ConnectWallet";
 import { Loading } from "./Loading";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
-import { Shelf } from "./Shelf";
-import { Mint } from "./Mint";
 
 // This is the Hardhat Network id, you might change it in the hardhat.config.js
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
@@ -106,19 +103,6 @@ export class Dapp extends React.Component {
             </p>
           </div>
         </div>
-
-        <hr />
-
-        <div className="row">
-            <div className="col-12">
-                <Shelf
-                    fetch={() =>
-                    this._fetchNFTs()
-                    }
-                />
-            </div>
-        </div>
-
         <div className="row">
           <div className="col-12">
             {/*
@@ -140,22 +124,6 @@ export class Dapp extends React.Component {
                 dismiss={() => this._dismissTransactionError()}
               />
             )}
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-12">
-            {/*
-              This component displays a form that the user can use to send a
-              transaction and transfer some tokens.
-              The component doesn't have logic, it just calls the transferTokens
-              callback.
-            */}
-              <Mint
-                mintToken={(to, amount) =>
-                  this._mintToken(to, amount)
-                }
-              />
           </div>
         </div>
       </div>
@@ -271,46 +239,6 @@ export class Dapp extends React.Component {
   async _updateBalance() {
     const balance = await this._mixtape.balanceOf(this.state.selectedAddress);
     this.setState({ balance });
-  }
-
-  async _fetchNFTs() {
-      try {
-        const total = await this._mixtape.totalSupply();
-        let uriList = [];
-        let i = 0;
-        for (i = 0; i < total; i++) {
-            let tokenID = await this._mixtape.tokenByIndex(i);
-            let uri = await this._mixtape.tokenURI(tokenID);
-            uriList.push(uri);
-        }
-
-        return uriList;
-      } catch (error) {
-        console.log(error);
-      }
-  }
-
-  async _mintToken(to, uri) {
-    try {
-          const tx = await this._mixtape.createMixtape(to, uri);
-          this.setState({ txBeingSent: tx.hash });
-
-          const receipt = await tx.wait();
-            if (receipt.status === 0) {
-                throw new Error("Transaction failed");
-            }
-
-      } catch (error) {
-          console.log(error);
-          if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-            return;
-          }
-          this.setState({ transactionError: error });
-      } finally {
-        // If we leave the try/catch, we aren't sending a tx anymore, so we clear
-        // this part of the state.
-        this.setState({ txBeingSent: undefined });
-      }
   }
 
 
