@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {
   BrowserRouter as Router,
   Switch,
@@ -10,6 +10,7 @@ import MixtapeArtifact from "./contracts/Mixtape.json";
 import contractAddress from "./contracts/contract-address.json";
 
 import { Dapp } from "./components/Dapp";
+import Form from './components/Form';
 import Home from './components/Home';
 import Shelf  from "./components/Shelf";
 import { NoWalletDetected } from "./components/NoWalletDetected";
@@ -19,6 +20,10 @@ import { ConnectWallet } from "./components/ConnectWallet";
 const App = () => {
     const [address, setAdress] = useState(null);
     const [contract, setContract] = useState(null);
+
+    useEffect(() => {
+        _connectWallet();
+    }, [])
 
       const _connectWallet = async () => {
         const [selectedAddress] = await window.ethereum.enable();
@@ -46,18 +51,35 @@ const App = () => {
         return <NoWalletDetected />;
     }
 
-    if (!address) {
+    // need some way to save state of wallet connection
+    // if (!window.ethereum.isConnected()) {
+    //     return (
+    //         <ConnectWallet
+    //             connectWallet={() => _connectWallet()}
+    //         />
+    //     );
+    // }
+
+    // need some sort of loading state while it connects to the contract...
+    // or is there a way to store the contract in memory or something so it
+    // does not have to reload on every page reload
+    if (address == null) {
         return (
-            <ConnectWallet
-                connectWallet={() => _connectWallet()}
-            />
-        );
+            <div>
+                loading ...
+            </div>
+        )
     }
 
     return (
         <Router>
             <div>
                 <Switch>
+                    <Route path="/new">
+                        <Form contract={contract} />
+                    </Route>
+                    {/* Dapp is leftover from the boilerplate I built this off but there is still */}
+                    {/* good code to reference so I am leaving it in for now. */}
                     <Route path="/dapp">
                         <Dapp />
                     </Route>
@@ -65,7 +87,7 @@ const App = () => {
                         <Shelf contract={contract} />
                     </Route>
                     <Route path="/">
-                        <Home contract={contract} />
+                        <Home />
                     </Route>
                 </Switch>
             </div>
