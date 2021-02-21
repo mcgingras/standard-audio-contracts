@@ -76,8 +76,6 @@ const Form = ({contract}) => {
       );
 
       const addSong = (song) => {
-          console.log(song)
-          setQuery("");
           let songData = {
               id: song.id,
               name: song.name,
@@ -103,41 +101,52 @@ const Form = ({contract}) => {
     }
 
     return (
-        <div className="container mx-auto">
-            <h1 className="text-xl font-bold">Create a new Mixtape</h1>
+        <div className="mt-4 max-w-screen-md mx-auto">
+            <h1 className="text-3xl font-bold">Create a new Mixtape</h1>
             { !isLoggedIn ? <a href="http://localhost:8888/login">login to spotify</a> :
-            <div>
-                <form onSubmit={(event) => { mintNFT(event) }}>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mt-4">Title</label>
-                        <input type="text" name="title" className="border shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
-                    </div>
-                    <label className="block text-sm font-medium text-gray-700 mt-4">Songs</label>
-                    <input
-                    className="border-l border-t border-r w-full rounded-t-lg px-4 py-2"
-                    type="text"
-                    placeholder="Search Spotify"
-                    value={query}
-                    onChange={e => setQuery(e.target.value)}
-                    />
-                    {isSearching && <div>Searching ...</div>}
-                    <div className="border rounded-b-lg">
-                        {tracks.map(result => (
-                        <div key={result.id} onClick={() => addSong(result)} className="hover:bg-gray-200 w-full px-4 py-1">
-                            <h4>{result.name} - {result.artists.map((artist) => artist.name).join(', ')}</h4>
+            <div className="grid grid-cols-5 gap-4">
+                <div className="col-span-3">
+                    <form onSubmit={(event) => { mintNFT(event) }}>
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Title</label>
+                            <input type="text" name="title" className="border focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-md px-4 py-2" />
+                        </div>
+                        <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Songs</label>
+                        <input
+                        className="border-l border-t border-r w-full rounded-t-lg px-4 py-2"
+                        type="text"
+                        placeholder="Search Spotify"
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
+                        />
+                        {isSearching && <div>Searching ...</div>}
+                        <div className="border rounded-b-lg shadow-md max-h-96 overflow-scroll">
+                            {tracks.map(result => (
+                            <div key={result.id} onClick={() => addSong(result)} className="hover:bg-gray-200 w-full px-2 py-2 flex">
+                                <img src={result.album.images[2].url} />
+                                <div className="ml-2">
+                                    <h4 className="font-lg">{result.name}</h4>
+                                    <h4 className="text-gray-500">{result.artists.map((artist) => artist.name).join(', ')}</h4>
+                                </div>
+                            </div>
+                            ))}
+                        </div>
+                        <button type="submit" className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+                <div className="col-span-2">
+                    <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Tracklist</label>
+                    <div className="border p-4 rounded-md">
+                        {songs.map((result, index) => (
+                        <div key={result.id} className="w-full px-4 py-1">
+                            {`${index + 1}. ${result.name} - ${result.artists}`}
+                            <input type="hidden" name={`song-${index}`} value={result.id} />
                         </div>
                         ))}
                     </div>
-                    {songs.map((result, index) => (
-                    <div key={result.id} className="w-full px-4 py-1">
-                        {`${result.name} - ${result.artists}`}
-                        <input type="hidden" name={`song-${index}`} value={result.id} />
-                    </div>
-                    ))}
-                    <button type="submit" className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        Submit
-                    </button>
-                </form>
+                </div>
             </div>
             }
         </div>
