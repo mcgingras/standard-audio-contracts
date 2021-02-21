@@ -104,23 +104,40 @@ const Form = ({contract}) => {
         <div className="mt-4 max-w-screen-md mx-auto">
             <h1 className="text-3xl font-bold">Create a new Mixtape</h1>
             { !isLoggedIn ? <a href="http://localhost:8888/login">login to spotify</a> :
+            <form onSubmit={(event) => { mintNFT(event) }}>
             <div className="grid grid-cols-5 gap-4">
-                <div className="col-span-3">
-                    <form onSubmit={(event) => { mintNFT(event) }}>
+                    <div className="col-span-3">
                         <div>
                             <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Title</label>
                             <input type="text" name="title" className="border focus:ring-indigo-500 focus:border-indigo-500 block w-full rounded-md px-4 py-2" />
                         </div>
-                        <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Songs</label>
+                        <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Tracklist</label>
+                        <div className="border p-4 rounded-md">
+                            {songs.length === 0 &&
+                            <div className="text-gray-500 text-center p-10">
+                                Tracklist empty! <br/>
+                                Add tracks with the searchbar to the right &rarr;
+                            </div>
+                            }
+                            {songs.map((result, index) => (
+                            <div key={result.id} className="w-full px-4 py-1">
+                                {`${index + 1}. ${result.name} - ${result.artists}`}
+                                <input type="hidden" name={`song-${index}`} value={result.id} />
+                            </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="col-span-2">
+                        <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Add Songs</label>
                         <input
-                        className="border-l border-t border-r w-full rounded-t-lg px-4 py-2"
+                        className={query ? "border-l border-t border-r w-full rounded-t-lg px-4 py-2" : "border w-full rounded-lg px-4 py-2"}
                         type="text"
                         placeholder="Search Spotify"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                         />
                         {isSearching && <div>Searching ...</div>}
-                        <div className="border rounded-b-lg shadow-md max-h-96 overflow-scroll">
+                        <div className={query && "border rounded-b-lg shadow-md max-h-96 overflow-scroll"}>
                             {tracks.map(result => (
                             <div key={result.id} onClick={() => addSong(result)} className="hover:bg-gray-200 w-full px-2 py-2 flex">
                                 <img src={result.album.images[2].url} />
@@ -131,23 +148,14 @@ const Form = ({contract}) => {
                             </div>
                             ))}
                         </div>
+                    </div>
+                    <div className="col-span-5 border-t">
                         <button type="submit" className="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Submit
+                            Create
                         </button>
-                    </form>
-                </div>
-                <div className="col-span-2">
-                    <label className="block text-sm font-bold text-gray-700 mt-4 mb-2">Tracklist</label>
-                    <div className="border p-4 rounded-md">
-                        {songs.map((result, index) => (
-                        <div key={result.id} className="w-full px-4 py-1">
-                            {`${index + 1}. ${result.name} - ${result.artists}`}
-                            <input type="hidden" name={`song-${index}`} value={result.id} />
-                        </div>
-                        ))}
                     </div>
                 </div>
-            </div>
+            </form>
             }
         </div>
     )
