@@ -15,6 +15,8 @@ describe("Mixtape contract", function () {
 
         mixtapeContract = await Mixtape.deploy();
         await mixtapeContract.deployed();
+
+        // console.log(mixtapeContract);
     });
 
     describe("Sanity check...", function () {
@@ -30,6 +32,14 @@ describe("Mixtape contract", function () {
         const tx = await mixtapeContract.createMixtape(owner.address, _testURI);
         const mixtapeURI = mixtapeContract.tokenURI(await mixtapeContract.tokenByIndex(0));
         expect(mixtapeURI === _testURI);
+
+        // I hardcoded values for the struct... need to change this
+        // but this is a sanity check that it works at least
+        const mixValues = await mixtapeContract.mixes(0);
+        expect(mixValues.s === 1);
+        expect(mixValues.s === 2);
+        expect(mixValues.s === 3);
+
       });
   })
 });

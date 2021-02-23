@@ -1,12 +1,12 @@
 //SPDX-License-Identifier: UNLICENSED
-
 pragma solidity ^0.7.0;
 import "hardhat/console.sol";
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract Mixtape is ERC721 {
+contract Mixtape is ERC721, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -18,14 +18,21 @@ contract Mixtape is ERC721 {
         uint256 a; // <- appearance
     }
 
+    /// @dev An array containing the Mix struct for all 1000 Mixtapes.
+    /// should we hardcode the amount? 1000?
     Mix[] public mixes;
 
-    constructor() public ERC721("Mixtape", "MIX") {}
+    // probably want an event for when a new token is minted?
+
+    constructor() public ERC721("CryptoCassettes", "MIX") {}
 
     function createMixtape(address owner, string memory tokenURI)
         public
+        onlyOwner
         returns (uint256)
     {
+        mixes.push(Mix(1,2,3));
+
         _tokenIds.increment();
 
         uint256 newMixtapeId = _tokenIds.current();

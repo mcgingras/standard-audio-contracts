@@ -91,6 +91,26 @@ const Form = ({contract}) => {
         const formdata = new FormData(event.target);
         const value = Object.fromEntries(formdata.entries());
 
+        // ERC721 URI SCHEMA
+        // {
+        //     "title": "Asset Metadata",
+        //     "type": "object",
+        //     "properties": {
+        //         "name": {
+        //             "type": "string",
+        //             "description": "Identifies the asset to which this NFT represents"
+        //         },
+        //         "description": {
+        //             "type": "string",
+        //             "description": "Describes the asset to which this NFT represents"
+        //         },
+        //         "image": {
+        //             "type": "string",
+        //             "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+        //         }
+        //     }
+        // }
+
         // send form data off to pinata, collect ipfs hash
         let ipfsResponse = await pinJSONToIPFS(value);
         let hash = ipfsResponse.data.IpfsHash;
