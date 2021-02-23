@@ -15,6 +15,7 @@ Create mixtapes as NFTs.
 - Improve test coverage.
 - Obvious some style changes.
 - Nonce issue?
+- Properties of mixtapes? Max # of songs - visuals, etc... how to make them different
 
 ### Questions
 - Do we want the song urls to be spotify or soundcloud?

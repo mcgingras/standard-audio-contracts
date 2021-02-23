@@ -10,6 +10,16 @@ contract Mixtape is ERC721 {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    // does it matter if the names of variables are long or short
+    // in terms of how much gas it cost to store the contract?
+    struct Mix {
+        uint16 s;  // <- size
+        uint8 q;   // <- quality
+        uint256 a; // <- appearance
+    }
+
+    Mix[] public mixes;
+
     constructor() public ERC721("Mixtape", "MIX") {}
 
     function createMixtape(address owner, string memory tokenURI)
