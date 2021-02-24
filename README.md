@@ -1,5 +1,9 @@
-# NFT MIXTAPES
-Create mixtapes as NFTs.
+# CryptoCassettes
+Because who doesn’t want a mixtape on the blockchain.
+
+NFT Mixtapes are an experiment in NFTs, the intrinsic value of digitally scarce goods, and absolutely useless (but fun!) things on the internet. There’s really no point in owning a mixtape on the blockchain but then again is there anypoint in owning a 20x20 pixel “cryptopunk” either? This is art, thank you very much.
+
+CryptoCasettes are ERC-721 crypto-collectibles on the Ethereum blockchain. Unlike most ERC-721 collectibles that are relatively static “art” pieces, CryptoCasettes aim to bring a bit of dynamism into the mix through the playable nature of the mixtapes.
 
 ### Stack
 - [Hardhat](https://hardhat.org/)
