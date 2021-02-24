@@ -65,9 +65,7 @@ const App = () => {
     // does not have to reload on every page reload
     if (address == null) {
         return (
-            <div>
-                loading ...
-            </div>
+            <div></div>
         )
     }
 

@@ -122,8 +122,14 @@ const Form = ({contract}) => {
 
     return (
         <div className="mt-4 max-w-screen-md mx-auto">
-            <h1 className="text-3xl font-bold">Create a new Mixtape</h1>
-            { !isLoggedIn ? <a href="http://localhost:8888/login">login to spotify</a> :
+            <h1 className="text-3xl font-bold">Claim your Cassette</h1>
+            { !isLoggedIn
+            ?
+            <div>
+                <p>You must be logged into spotify to claim a cassette.</p>
+                <a href="http://localhost:8888/login" className="self-end flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Login to Spotify</a>
+            </div>
+            :
             <form onSubmit={(event) => { mintNFT(event) }}>
             <div className="grid grid-cols-5 gap-4">
                     <div className="col-span-3">

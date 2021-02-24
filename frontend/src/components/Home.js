@@ -1,33 +1,56 @@
 import React from 'react';
+import Header from './Header';
 
+// Placeholder for the cassettes
+// will fill this out later.
+const Placeholder = () => {
+    return (
+        <div className="cursor-pointer bg-white p-8 border rounded-lg hover:shadow-md text-center text-gray-500">cassette name</div>
+    )
+}
+
+// Copy could use some work here by eh, its here.
 const Home = () => {
     return (
-        <div className="relative bg-gray-50 overflow-hidden h-screen">
-            <div className="relative pt-6 pb-16 sm:pb-24">
-                <main className="mt-16 mx-auto max-w-7xl px-4 sm:mt-24">
-                    <div className="text-center">
-                        <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                            <span className="block xl:inline">Mixtape</span>
-                            <span className="block text-indigo-600 xl:inline">NFTs</span>
-                        </h1>
-                        <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-                            Create mixtapes and mint them as NFTs to send to your friends! We need better copy here! This is all just boilerplate anyways!!!
-                        </p>
-                        <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-                            <div className="rounded-md shadow">
-                                <a href="/new" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 md:py-4 md:text-lg md:px-10">
-                                    Create Mix
-                                </a>
-                            </div>
-                            <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                                <a href="shelf" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10">
-                                    View All
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </main>
+        <div className="bg-gray-100 min-h-screen">
+            <Header />
+            <div className="max-w-screen-xl mx-auto">
+                <h3 className="text-gray-700 font-semibold text-lg mt-16">For Sale</h3>
+                <h5 className="text-gray-500 text-base mt-2">These cassettes are currently for sale by their owner.</h5>
+                <div className="grid grid-cols-6 gap-8 mt-8">
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                </div>
+                <h3 className="text-gray-700 font-semibold text-lg mt-16">Open Bids</h3>
+                <h5 className="text-gray-500 text-base mt-2">These cassettes currently have open bids.</h5>
+                <div className="grid grid-cols-6 gap-8 mt-8">
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                    <Placeholder />
+                </div>
             </div>
+            <footer className="max-w-screen-xl mx-auto mt-16 border-t py-4">
+                <span className="text-sm text-gray-500">mg - 2021</span>
+            </footer>
         </div>
     )
 }

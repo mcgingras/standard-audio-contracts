@@ -19,13 +19,16 @@ contract Mixtape is ERC721, Ownable {
     }
 
     /// @dev An array containing the Mix struct for all 1000 Mixtapes.
-    /// should we hardcode the amount? 1000?
     Mix[] public mixes;
 
     // probably want an event for when a new token is minted?
 
     constructor() public ERC721("CryptoCassettes", "MIX") {}
 
+    /// @dev function to mint new Cassettes
+    /// need to change the name to `createCassette` if thats what were going with
+    /// required: only owner of contract can mint new tokens
+    /// alternative strategy - anyone mints, but after 1000 this function is deprecated
     function createMixtape(address owner, string memory tokenURI)
         public
         onlyOwner

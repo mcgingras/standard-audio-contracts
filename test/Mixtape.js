@@ -41,5 +41,11 @@ describe("Mixtape contract", function () {
         expect(mixValues.s === 3);
 
       });
+
+      it("Should only allow owner to mint a new NFT", async function() {
+        const _testURI = "this should fail";
+        await expect(mixtapeContract.connect(addr1).createMixtape(addr2.address, _testURI))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+      })
   })
 });
