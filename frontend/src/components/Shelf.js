@@ -28,7 +28,6 @@ const Shelf = ({contract}) => {
               uriList.push(response.data);
           }
 
-          console.log(uriList);
           return uriList;
         } catch (error) {
           console.log(error);
@@ -38,7 +37,7 @@ const Shelf = ({contract}) => {
     useEffect(() => {
         async function fetchData(){
             let mixes = await fetchNFTs();
-            console.log(mixes)
+            console.log(mixes);
             setMixes(mixes);
         }
         if (contract != null) {
