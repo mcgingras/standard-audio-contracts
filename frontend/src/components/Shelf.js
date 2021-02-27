@@ -21,7 +21,7 @@ const Shelf = ({contract}) => {
           const total = await contract.totalSupply();
           let uriList = [];
           let i = 0;
-          for (i = 0; i < total; i++) {
+          for (i = 0; i < 20; i++) {
               let tokenID = await contract.tokenByIndex(i);
               let uri = await contract.tokenURI(tokenID);
               let response = await getIPFSData(uri);
@@ -48,11 +48,11 @@ const Shelf = ({contract}) => {
     return (
         <div className="container mx-auto">
             <h4 className="text-xl font-bold">Browse Mixtapes</h4>
-            <div className="flex">
+            <div className="grid grid-cols-5 gap-4">
                 {
                     mixes.map((mixData) => {
                         return (
-                            <div className="" key={mixData.title}>
+                            <div className="border p-2 rounded-sm" key={mixData.title}>
                                 {mixData.title}
                             </div>
                         )
