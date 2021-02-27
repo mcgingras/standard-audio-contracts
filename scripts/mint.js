@@ -1,8 +1,11 @@
 const axios = require('axios');
+const faker = require('faker');
 
 const MixtapeArtifact = require("../frontend/src/contracts/Mixtape.json");
 const contractAddress = require("../frontend/src/contracts/contract-address.json");
+const attributes = require("./attributes.json");
 require('dotenv').config()
+
 
 async function main() {
 
@@ -22,30 +25,33 @@ async function main() {
     owner
   );
 
-  for (let i=0; i<10; i++) {
-    let t = await mintNFT(contract, addr1.address);
-    console.log(t);
+  let attrs = attributes.attributes;
+
+  for (let i=0; i<attrs.length; i++) {
+      [color, capacity, quality] = attrs[i];
+      let t = await mintNFT(contract, addr1.address, capacity, quality, color);
+      console.log(t);
   }
 }
 
-const mintNFT = async (contract, to) => {
+const mintNFT = async (contract, to, s, q, a) => {
 
     const uri = {
-        title: "DEMO",
-        song1: "abc",
-        song2: "def",
-        song3: "ghi"
+        title: faker.company.catchPhrase(),
+        song1: faker.company.companyName(),
+        song2: faker.company.companyName(),
+        song3: faker.company.companyName(),
     }
 
     let ipfsResponse = await pinJSONToIPFS(uri);
     let hash = ipfsResponse.data.IpfsHash;
 
-    let response = await mintToken(contract, to, hash);
+    let response = await mintToken(contract, to, hash, s, q, a);
     return response;
 }
 
-const mintToken = async (contract, to, uri) => {
-    const tx = await contract.createMixtape(to, uri);
+const mintToken = async (contract, to, uri, s, q, a) => {
+    const tx = await contract.createMixtape(to, uri, s, q, a);
     const receipt = await tx.wait();
 
     return receipt;
