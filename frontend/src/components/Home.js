@@ -1,5 +1,7 @@
 import React from 'react';
 import Header from './Header';
+import Modal from './Modal';
+import { ethers } from "ethers";
 import Cassette from './Cassette';
 
 // Placeholder for the cassettes
@@ -10,11 +12,17 @@ const Placeholder = () => {
     )
 }
 
+const connectWallet = async () => {
+    // console.log(window.ethereum.selectedAddress);
+    const [selectedAddress] = await window.ethereum.enable();
+}
+
 // Copy could use some work here by eh, its here.
 const Home = () => {
     return (
         <div className="bg-gray-100 min-h-screen">
             <Header />
+            {/* <Modal title="Connect Your Wallet" subtitle="Connect your wallet to buy, sell, and trade cryptocassettes." buttonTitle="Metamask" buttonAction={connectWallet} /> */}
             <div className="max-w-screen-xl mx-auto">
                 <h3 className="text-gray-700 font-semibold text-lg mt-16">For Sale</h3>
                 <h5 className="text-gray-500 text-base mt-2">These cassettes are currently for sale by their owner.</h5>

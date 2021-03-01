@@ -38,7 +38,7 @@ const Shelf = ({contract}) => {
         async function fetchData(){
             let mixes = await fetchNFTs();
             console.log(mixes);
-            setMixes(mixes);
+            // setMixes(mixes);
         }
         if (contract != null) {
             fetchData();
