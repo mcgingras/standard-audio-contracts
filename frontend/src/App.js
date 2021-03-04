@@ -1,11 +1,14 @@
 import React, {useState, useEffect} from "react";
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
+import appReducer from './reducers';
+import { UseWalletProvider } from 'use-wallet';
 import {
   BrowserRouter as Router,
   Switch,
   Route
 } from "react-router-dom";
 import { ethers } from "ethers";
-
 import MixtapeArtifact from "./contracts/Mixtape.json";
 import contractAddress from "./contracts/contract-address.json";
 
@@ -16,13 +19,12 @@ import { NoWalletDetected } from "./components/NoWalletDetected";
 import { ConnectWallet } from "./components/ConnectWallet";
 
 
+
 const App = () => {
     const [address, setAdress] = useState(null);
     const [contract, setContract] = useState(null);
 
-    // useEffect(() => {
-    //     _connectWallet();
-    // }, [])
+    const store = createStore(appReducer);
 
       const _connectWallet = async () => {
         const [selectedAddress] = await window.ethereum.enable();
@@ -60,21 +62,23 @@ const App = () => {
     // }
 
     return (
-        <Router>
-            <div>
-                <Switch>
-                    <Route path="/new">
-                        <Form contract={contract} />
-                    </Route>
-                    <Route path="/shelf">
-                        <Shelf contract={contract} />
-                    </Route>
-                    <Route path="/">
-                        <Home />
-                    </Route>
-                </Switch>
-            </div>
-        </Router>
+        <UseWalletProvider chainId={1337}>
+            <Provider store={store}>
+                <Router>
+                    <Switch>
+                        <Route path="/new">
+                            <Form contract={contract} />
+                        </Route>
+                        <Route path="/shelf">
+                            <Shelf contract={contract} />
+                        </Route>
+                        <Route path="/">
+                            <Home />
+                        </Route>
+                    </Switch>
+                </Router>
+            </Provider>
+        </UseWalletProvider>
     );
 }
 
