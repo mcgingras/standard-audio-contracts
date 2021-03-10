@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
-const axios = require('axios');
 
+const axios = require('axios');
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 
 const Form = ({contract}) => {
@@ -48,6 +48,7 @@ const Form = ({contract}) => {
         }
       }, [])
 
+
       const searchSpotify = (q) => {
         return fetch(`https://api.spotify.com/v1/search/?q=${q}&type=track`, {
           method: 'GET',
@@ -90,26 +91,6 @@ const Form = ({contract}) => {
         // package form data
         const formdata = new FormData(event.target);
         const value = Object.fromEntries(formdata.entries());
-
-        // ERC721 URI SCHEMA
-        // {
-        //     "title": "Asset Metadata",
-        //     "type": "object",
-        //     "properties": {
-        //         "name": {
-        //             "type": "string",
-        //             "description": "Identifies the asset to which this NFT represents"
-        //         },
-        //         "description": {
-        //             "type": "string",
-        //             "description": "Describes the asset to which this NFT represents"
-        //         },
-        //         "image": {
-        //             "type": "string",
-        //             "description": "A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
-        //         }
-        //     }
-        // }
 
         // send form data off to pinata, collect ipfs hash
         let ipfsResponse = await pinJSONToIPFS(value);
@@ -186,6 +167,7 @@ const Form = ({contract}) => {
         </div>
     )
 }
+
 
 const pinJSONToIPFS = (JSONBody) => {
     const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;

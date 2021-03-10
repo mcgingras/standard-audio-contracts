@@ -17,6 +17,8 @@ import Home from './components/Home';
 import Shelf  from "./components/Shelf";
 import { NoWalletDetected } from "./components/NoWalletDetected";
 import { ConnectWallet } from "./components/ConnectWallet";
+import CassettePage from './components/CassettePage';
+import Player from './components/Player';
 
 
 
@@ -66,8 +68,14 @@ const App = () => {
             <Provider store={store}>
                 <Router>
                     <Switch>
+                        <Route path="/cassette/:id">
+                            <CassettePage />
+                        </Route>
                         <Route path="/new">
                             <Form contract={contract} />
+                        </Route>
+                        <Route path="/player">
+                            <Player />
                         </Route>
                         <Route path="/shelf">
                             <Shelf contract={contract} />
