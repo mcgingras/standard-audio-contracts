@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ethers } from 'ethers';
-import { useWallet } from 'use-wallet';
 
 import Modal from './Modal';
 import Cassette from './Cassette';
@@ -9,18 +8,8 @@ import Cassette from './Cassette';
 
 const Home = () => {
     const state = useSelector(state => state.test);
-    const wallet = useWallet()
-
     const [isOpen, setIsOpen] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
-
-    useEffect(() => {
-        wallet.connect("injected");
-    }, []);
-
-    const connectWallet = () => {
-        wallet.connect();
-    }
 
     return (
         <div className="bg-gray-100 min-h-screen">
@@ -28,7 +17,6 @@ const Home = () => {
                 <div className="max-w-screen-xl mx-auto">
                     <div className="py-8 border-b border-black border-opacity-20 flex justify-between">
                         <h1 className="text-white font-bold text-3xl">CryptoCassettes</h1>
-                        { wallet.status === "connected" ? <p className="text-white text-opacity-70 truncate w-48">connected to {wallet.account}</p> : <button onClick={() => setModalOpen(true)} className="self-end flex justify-center items-center px-4 py-2 bg-opacity-30 border border-white border-opacity-30 shadow-sm font-medium rounded-md text-white bg-white hover:bg-opacity-50">Connect Wallet</button> }
                     </div>
                     <div className="py-16 flex justify-between">
                         <div>
@@ -44,7 +32,6 @@ const Home = () => {
                 title="Connect Your Wallet"
                 subtitle="Connect your wallet to buy, sell, and trade cryptocassettes."
                 buttonTitle="Metamask"
-                buttonAction={connectWallet}
             />
             <div className="max-w-screen-xl mx-auto">
                 <h3 className="text-gray-700 font-semibold text-lg mt-16">For Sale</h3>
