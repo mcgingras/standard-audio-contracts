@@ -1,3 +1,12 @@
+@font-face{
+  font-family: 'ObjectSans';
+  src: url("./fonts/ObjectSans/ObjectSans-Regular.otf") format('opentype');
+}
+
+*{
+  font-family: 'ObjectSans';
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

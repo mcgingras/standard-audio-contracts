@@ -8,16 +8,11 @@ import Cassette from './Cassette';
 
 const Home = () => {
     const state = useSelector(state => state.test);
-    const [isOpen, setIsOpen] = useState(false);
-    const [modalOpen, setModalOpen] = useState(false);
 
     return (
         <div className="bg-gray-100 min-h-screen">
             <header className="bg-gradient-to-r from-light-blue-800 to-cyan-600 w-100">
                 <div className="max-w-screen-xl mx-auto">
-                    <div className="py-8 border-b border-black border-opacity-20 flex justify-between">
-                        <h1 className="text-white font-bold text-3xl">CryptoCassettes</h1>
-                    </div>
                     <div className="py-16 flex justify-between">
                         <div>
                             <h3 className="text-white text-4xl font-semibold">The same mixtapes you love,</h3>
@@ -27,12 +22,6 @@ const Home = () => {
                     </div>
                 </div>
             </header>
-            <Modal
-                isOpen={modalOpen}
-                title="Connect Your Wallet"
-                subtitle="Connect your wallet to buy, sell, and trade cryptocassettes."
-                buttonTitle="Metamask"
-            />
             <div className="max-w-screen-xl mx-auto">
                 <h3 className="text-gray-700 font-semibold text-lg mt-16">For Sale</h3>
                 <h5 className="text-gray-500 text-base mt-2">These cassettes are currently for sale by their owner.</h5>
