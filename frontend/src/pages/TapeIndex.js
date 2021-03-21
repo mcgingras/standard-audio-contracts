@@ -1,5 +1,6 @@
 import React from 'react';
 import Nav from '../components/Nav';
+import CassetteGrid from '../components/CassetteGrid';
 
 const TapeIndex = () => {
   return (
@@ -15,6 +16,7 @@ const TapeIndex = () => {
       </section>
 
       <section class="container mx-auto mt-10">
+        <CassetteGrid cassettes={[1,2,3,4]} />
       </section>
     </div>
   )
