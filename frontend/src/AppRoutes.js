@@ -19,6 +19,7 @@ import TapeIndex from './pages/TapeIndex';
 import TapeEdit from './pages/TapeEdit';
 import TapeShow from './pages/TapeShow';
 import MyTapes from './pages/MyTapes';
+import Den from './pages/Den';
 
 
 const App = () => {
@@ -77,6 +78,9 @@ const App = () => {
               </nav> */}
               <Router>
                   <Switch>
+                      <Route path="/den">
+                          <Den />
+                      </Route>
                       <Route path="/shelf">
                           <MyTapes />
                       </Route>

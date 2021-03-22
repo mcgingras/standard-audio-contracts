@@ -7,7 +7,7 @@ const Form = ({contract}) => {
     const [token, setToken] = useState('');
     const [isLoggedIn, setLoggedIn] = useState(false);
     const [query, setQuery] = useState('');
-    const [tracks, setTracks] = useState([])
+    const [tracks, setTracks] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const debouncedQuery = useDebounce(query, 500);
 
@@ -189,20 +189,16 @@ const pinJSONToIPFS = (JSONBody) => {
 // We could probably make this a hook instead but ah its fine for now
 function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
-
     useEffect(
       () => {
         const handler = setTimeout(() => {
           setDebouncedValue(value);
         }, delay);
 
-        return () => {
-          clearTimeout(handler);
-        };
+        return () => { clearTimeout(handler) };
       },
       [value, delay]
     );
-
     return debouncedValue;
 }
 
