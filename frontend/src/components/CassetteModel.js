@@ -1,6 +1,6 @@
 import React, {Suspense} from 'react';
 import { Canvas } from 'react-three-fiber'
-import Model from '../assets/models/Cassette';
+import Model from './three/Cassette';
 import { PerspectiveCamera, OrbitControls } from '@react-three/drei'
 import { useResource } from 'react-three-fiber'
 

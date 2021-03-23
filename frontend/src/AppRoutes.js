@@ -20,6 +20,7 @@ import TapeEdit from './pages/TapeEdit';
 import TapeShow from './pages/TapeShow';
 import MyTapes from './pages/MyTapes';
 import Den from './pages/Den';
+import Demo from './components/three/Demo';
 
 
 const App = () => {
@@ -67,38 +68,28 @@ const App = () => {
     }
 
     return (
-          <Provider store={store}>
-              {/* <nav className="p-2 bg-gradient-to-r from-light-blue-800 to-cyan-600 w-100 flex justify-between px-4">
-                <h1>NFTapes</h1>
-                {
-                  web3Modal.cachedProvider
-                  ? <button onClick={ () => logoutOfWeb3Modal() }>Logout</button>
-                  : <button onClick={ () => loadWeb3Modal() }>Connect</button>
-                }
-              </nav> */}
-              <Router>
-                  <Switch>
-                      <Route path="/den">
-                          <Den />
-                      </Route>
-                      <Route path="/shelf">
-                          <MyTapes />
-                      </Route>
-                      <Route path="/tapes/:id/edit">
-                          <TapeEdit />
-                      </Route>
-                      <Route path="/tapes/:id">
-                          <TapeShow />
-                      </Route>
-                      <Route path="/tapes">
-                          <TapeIndex />
-                      </Route>
-                      <Route path="/">
-                          <Homepage />
-                      </Route>
-                  </Switch>
-              </Router>
-          </Provider>
+        <Router>
+            <Switch>
+                <Route path="/den">
+                    <Den />
+                </Route>
+                <Route path="/shelf">
+                    <MyTapes />
+                </Route>
+                <Route path="/tapes/:id/edit">
+                    <TapeEdit />
+                </Route>
+                <Route path="/tapes/:id">
+                    <TapeShow />
+                </Route>
+                <Route path="/tapes">
+                    <TapeIndex />
+                </Route>
+                <Route path="/">
+                    <Homepage />
+                </Route>
+            </Switch>
+        </Router>
     );
 }
 
@@ -118,3 +109,12 @@ const logoutOfWeb3Modal = async () => {
 };
 
 export default App;
+
+          //  <nav className="p-2 bg-gradient-to-r from-light-blue-800 to-cyan-600 w-100 flex justify-between px-4">
+          //       <h1>NFTapes</h1>
+          //       {
+          //         web3Modal.cachedProvider
+          //         ? <button onClick={ () => logoutOfWeb3Modal() }>Logout</button>
+          //         : <button onClick={ () => loadWeb3Modal() }>Connect</button>
+          //       }
+          //     </nav>
