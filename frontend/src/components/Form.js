@@ -46,7 +46,7 @@ const Form = ({contract}) => {
           setLoggedIn(true);
           setToken(c);
         }
-      }, [])
+      }, []);
 
 
       const searchSpotify = (q) => {

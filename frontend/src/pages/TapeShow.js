@@ -3,8 +3,8 @@ import CassetteModel from '../components/CassetteModel';
 
 const TapeShow = () => {
   return (
-    <div>
-        showing the tape here.
+    <div class="min-h-screen">
+      <CassetteModel />
     </div>
   )
 }
