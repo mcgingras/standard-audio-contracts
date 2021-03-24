@@ -1,7 +1,7 @@
 import React, {Suspense} from 'react';
 import { Canvas } from 'react-three-fiber'
-import Model from './three/Cassette';
-import { PerspectiveCamera, OrbitControls } from '@react-three/drei'
+import Scene from './three/Scene';
+import { PerspectiveCamera, OrbitControls, ContactShadows } from '@react-three/drei'
 import { useResource } from 'react-three-fiber'
 
 const CassetteModel = () => {
@@ -9,12 +9,12 @@ const CassetteModel = () => {
 
   return (
     <Canvas>
-      <PerspectiveCamera makeDefault ref={myCamera} position={[0, 20, 20]} />
-      <OrbitControls camera={myCamera.current} />
-        <ambientLight intensity={0.5} />
-        <Suspense fallback={null}>
-          <Model />
-        </Suspense>
+      <ambientLight intensity={.5} />
+      <directionalLight position={[5,10,7]} />
+      <Suspense fallback={null}>
+        <Scene />
+      </Suspense>
+      <OrbitControls />
     </Canvas>
   )
 }
