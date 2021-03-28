@@ -2,6 +2,11 @@ import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei/core/useGLTF'
 import { useControl } from 'react-three-gui';
 import { useFrame } from 'react-three-fiber'
+import * as THREE from "three";
+import carbon from '../../assets/textures/Carbon.png';
+import carbon2 from '../../assets/textures/Carbon_Normal.png';
+import { SphereGeometry } from 'three';
+
 
 export default function Scene(props) {
   /**
@@ -11,18 +16,25 @@ export default function Scene(props) {
   const rotateXY = useControl('Rotation', { type: 'xypad', distance: Math.PI });
 
   const group = useRef()
+  const light = useRef()
   const { nodes, materials } = useGLTF('/scene.gltf')
+  console.log(nodes)
 
   /**
    * Animation
    */
   useFrame(() => {
-    group.current.rotation.y += 0.01
+    const timer = Date.now() * 0.00050;
+    // light.current.position.x = Math.sin( timer * 7 ) * 300;
+    // light.current.position.y = Math.cos( timer * 5 ) * 400;
+    // light.current.position.z = Math.cos( timer * 3 ) * 300;
+    group.current.rotation.y = Math.sin( timer );
+    group.current.position.y = Math.sin( timer ) *.5 + .5;
   })
 
   return (
     <group ref={group} {...props} dispose={null}>
-      <group position={[0, 0, 0.0]} rotation-z={-0.5} rotation-y={-0.2} rotation-x={1.1} scale={[0.03, 0.03, 0.03]}>
+      <group position={[0, 1, 0]} rotation-x={Math.PI/2} scale={[.05, .05, .05]}>
         <mesh
           material={materials['_cdc59fd6-10ce-4ba8-9ae8-539142a14c3b_dae30c31-6130-48bb-b69f-756a153719d2']}
           geometry={nodes.screw_bottom_right.geometry}

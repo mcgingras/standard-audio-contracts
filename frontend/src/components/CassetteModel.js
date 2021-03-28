@@ -1,13 +1,10 @@
-import React, {Suspense} from 'react';
-import { Canvas } from 'react-three-fiber'
+import React, {Suspense, useRef} from 'react';
 import Scene from './three/Scene';
 import { OrbitControls } from '@react-three/drei'
-import { useResource } from 'react-three-fiber'
 import { Controls } from 'react-three-gui';
 
 
-const CassetteModel = () => {
-  const myCamera = useResource()
+const CassetteModel = ({colors}) => {
 
   const colorProp = {
     "screw": "#03045e",
@@ -35,7 +32,7 @@ const CassetteModel = () => {
         <ambientLight intensity={.5} />
         <directionalLight position={[5,10,7]} />
         <Suspense fallback={null}>
-          <Scene colors={colorProp} />
+          <Scene colors={colors} />
         </Suspense>
         <OrbitControls />
       </Controls.Canvas>

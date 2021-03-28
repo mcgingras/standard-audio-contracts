@@ -1,5 +1,4 @@
 import React, {useState, useEffect, useCallback} from "react";
-import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import appReducer from './reducers';
 import {
@@ -20,7 +19,6 @@ import TapeEdit from './pages/TapeEdit';
 import TapeShow from './pages/TapeShow';
 import MyTapes from './pages/MyTapes';
 import Den from './pages/Den';
-import Demo from './components/three/Demo';
 
 
 const App = () => {

@@ -1,33 +1,39 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Nav from '../components/Nav';
 import CassetteGrid from '../components/CassetteGrid';
 
-const cassetteDemoData = [
-  1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  7,
-  8
-]
-
 const Homepage = () => {
+  const [tapes, setTapes] = useState([]);
+
+
+  const fetchTapes = () => {
+    return fetch(`http://localhost:1234/tapes`, {
+      method: 'GET'
+    })
+    .then(res => res.json())
+  }
+
+  useEffect(() => {
+    fetchTapes()
+    .then(results => {
+      setTapes(results.tapes);
+    })
+  }, [])
+
   return (
     <div>
       <section className="bg-purple-800">
         <div className="container mx-auto pt-10">
         <Nav />
         <div className="py-40">
-          <h1 className="text-white text-4xl w-3/5" style={{"line-height": "3rem"}}>NFTapes are bringing cassettes to the digital age.</h1>
+          <h1 className="text-white text-4xl w-3/5" style={{"lineHeight": "3rem"}}>NFTapes are bringing cassettes to the digital age.</h1>
           <h3 className="text-white text-xl w-2/5 mt-4">Create a digital mixtape that is unique and rewriteable with songs served from Spotify.</h3>
         </div>
         </div>
       </section>
 
       <section className="container mx-auto mt-20 mb-40">
-        <CassetteGrid cassettes={cassetteDemoData} />
+        <CassetteGrid cassettes={tapes} />
       </section>
 
       <section className="container mx-auto mb-20">

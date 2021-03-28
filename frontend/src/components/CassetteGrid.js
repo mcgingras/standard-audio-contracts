@@ -2,12 +2,14 @@ import React from 'react'
 import Cassette from './Cassette';
 
 const CassetteGrid = ({cassettes}) => {
+  console.log(cassettes);
+
   return (
-    <div class="grid grid-cols-4 gap-8">
+    <div className="grid grid-cols-4 gap-8">
       {
         cassettes.map((cassette) => {
           return (
-            <Cassette />
+            <Cassette key={cassette.id} id={cassette.id} />
           )
         })
       }

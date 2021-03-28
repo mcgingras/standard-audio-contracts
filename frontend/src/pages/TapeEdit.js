@@ -111,7 +111,7 @@ const TapeEdit = () => {
               <div className={query && "bg-white border rounded-b-lg shadow-md max-h-96 overflow-scroll rounded-b-lg"}>
                   {tracks.map(result => (
                   <div key={result.id} onClick={() => addSong(result)} className="hover:bg-gray-200 w-full px-2 py-2 flex">
-                      <img src={result.album.images[2].url} />
+                      <img src={result.album.images[2].url} alt="album cover photo" />
                       <div className="ml-2">
                           <h4 className="font-lg text-gray-500">{result.name}</h4>
                           <h4 className="text-gray-500">{result.artists.map((artist) => artist.name).join(', ')}</h4>

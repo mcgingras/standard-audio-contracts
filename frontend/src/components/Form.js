@@ -65,7 +65,7 @@ const Form = ({contract}) => {
           if (debouncedQuery) {
             setIsSearching(true);
             searchSpotify(debouncedQuery).then(results => {
-                console.log(results);
+              console.log(results);
               setIsSearching(false);
               setTracks(results.tracks.items);
             });

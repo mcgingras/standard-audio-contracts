@@ -1,11 +1,7 @@
 import React, {useRef, useState} from 'react';
 import { Canvas, useFrame } from 'react-three-fiber'
-import { PerspectiveCamera, OrbitControls } from '@react-three/drei'
-import { useResource } from 'react-three-fiber'
 
 const Demo = () => {
-  const myCamera = useResource()
-
   return (
     <Canvas>
       <ambientLight />
