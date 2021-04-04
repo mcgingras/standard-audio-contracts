@@ -1,7 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import { Link } from "react-router-dom";
 
-const TapeEdit = () => {
+const axios = require('axios');
+const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
+
+const TapeEdit = ({contract}) => {
   const [token, setToken] = useState('');
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [query, setQuery] = useState('');
@@ -9,6 +12,9 @@ const TapeEdit = () => {
   const [isSearching, setIsSearching] = useState(false);
   const debouncedQuery = useDebounce(query, 500);
   const [songs, setSongs] = useState([]);
+  const [txHash, setTxHash] = useState(undefined);
+  const [txError, setTxError] = useState(undefined);
+  const [txBeingSent, setTxBeingSent] = useState(undefined);
 
   const searchSpotify = (q) => {
     return fetch(`https://api.spotify.com/v1/search/?q=${q}&type=track`, {
@@ -54,6 +60,43 @@ const TapeEdit = () => {
     }
     setSongs([...songs, songData])
   }
+
+  const mintNFT = async (event) => {
+    event.preventDefault();
+
+    // package form data
+    const formdata = new FormData(event.target);
+    const value = Object.fromEntries(formdata.entries());
+
+    // send form data off to pinata, collect ipfs hash
+    let ipfsResponse = await pinJSONToIPFS(value);
+    let hash = ipfsResponse.data.IpfsHash;
+
+    // mint NFT to chain
+    let response = await mintToken("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", hash);
+    console.log(response);
+}
+
+const mintToken = async (to, uri) => {
+        try {
+              const tx = await contract.createMixtape(to, uri);
+              setTxHash(tx.hash);
+
+              const receipt = await tx.wait();
+                if (receipt.status === 0) {
+                    throw new Error("Transaction failed");
+                }
+
+          } catch (error) {
+              console.log(error);
+              if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+                return;
+              }
+              setTxError(error);
+          } finally {
+            setTxBeingSent(undefined);
+          }
+    }
 
   return (
     <div class="bg-gray-800 text-white">
@@ -107,8 +150,9 @@ const TapeEdit = () => {
                 value={query}
                 onChange={e => setQuery(e.target.value)}
               />
-              {isSearching && <div>Searching ...</div>}
-              <div className={query && "bg-white border rounded-b-lg shadow-md max-h-96 overflow-scroll rounded-b-lg"}>
+              {isSearching && <div class="bg-white">Searching ...</div>}
+              { query &&
+              <div className="bg-white border rounded-b-lg shadow-md max-h-96 overflow-scroll rounded-b-lg">
                   {tracks.map(result => (
                   <div key={result.id} onClick={() => addSong(result)} className="hover:bg-gray-200 w-full px-2 py-2 flex">
                       <img src={result.album.images[2].url} alt="album cover photo" />
@@ -118,6 +162,10 @@ const TapeEdit = () => {
                       </div>
                   </div>
                   ))}
+              </div>
+              }
+              <div class="mt-8 self-end">
+                <button class="bg-green-300 hover:bg-green-400 text-gray-900 px-4 py-2 rounded-full">Create Cassette</button>
               </div>
             </div>
           </div>
@@ -130,6 +178,23 @@ const TapeEdit = () => {
 }
 
 export default TapeEdit;
+
+const pinJSONToIPFS = (JSONBody) => {
+  const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
+  return axios
+  .post(url, JSONBody, {
+      headers: {
+          pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
+          pinata_secret_api_key: process.env.REACT_APP_PINATA_SECRET_KEY
+      }
+  })
+  .then(function (response) {
+      return response;
+  })
+  .catch(function (error) {
+      console.log(error)
+  });
+};
 
 // We could probably make this a hook instead but ah its fine for now
 function useDebounce(value, delay) {

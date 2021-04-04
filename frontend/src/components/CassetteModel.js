@@ -1,5 +1,6 @@
 import React, {Suspense, useRef} from 'react';
 import Scene from './three/Scene';
+import TextureCassette from '../components/three/Tester-dimension-casette';
 import { OrbitControls } from '@react-three/drei'
 import { Controls } from 'react-three-gui';
 
@@ -32,7 +33,8 @@ const CassetteModel = ({colors}) => {
         <ambientLight intensity={.5} />
         <directionalLight position={[5,10,7]} />
         <Suspense fallback={null}>
-          <Scene colors={colors} />
+        {/* <Scene colors={colorProp} /> */}
+        <TextureCassette />
         </Suspense>
         <OrbitControls />
       </Controls.Canvas>

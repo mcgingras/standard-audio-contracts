@@ -1,6 +1,4 @@
 import React, {useState, useEffect, useCallback} from "react";
-import { createStore } from 'redux';
-import appReducer from './reducers';
 import {
   BrowserRouter as Router,
   Switch,
@@ -11,6 +9,10 @@ import MixtapeArtifact from "./contracts/Mixtape.json";
 import contractAddress from "./contracts/contract-address.json";
 import { NoWalletDetected } from "./components/NoWalletDetected";
 import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
+
+import useContract from './hooks/useContract';
+
 
 // pages
 import Homepage from './pages/Homepage';
@@ -25,21 +27,34 @@ const App = () => {
     const [address, setAdress] = useState(null);
     const [contract, setContract] = useState(null);
     const [injectedProvider, setInjectedProvider] = useState();
-    const store = createStore(appReducer);
+
+    const providerOptions = {
+      walletconnect: {
+        package: WalletConnectProvider,
+        options: {
+          infuraId: "60ecdce72df343308dc295b76d6deeb6"
+        }
+      }
+    };
 
     const loadWeb3Modal = useCallback(async () => {
+      const web3Modal = new Web3Modal({
+        cacheProvider: true,
+        providerOptions
+      });
       const provider = await web3Modal.connect();
       setInjectedProvider(new ethers.providers.Web3Provider(provider));
     }, [setInjectedProvider]);
 
+
     useEffect(() => {
       if (web3Modal.cachedProvider) {
+        console.log("cached")
         loadWeb3Modal();
       }
     }, [loadWeb3Modal]);
 
     useEffect(() => {
-
       const getSigner = async () => {
         if (injectedProvider) {
           const signer = injectedProvider.getSigner();
@@ -75,7 +90,7 @@ const App = () => {
                     <MyTapes />
                 </Route>
                 <Route path="/tapes/:id/edit">
-                    <TapeEdit />
+                    <TapeEdit contract={contract} />
                 </Route>
                 <Route path="/tapes/:id">
                     <TapeShow />
