@@ -48,7 +48,7 @@ const TapeShow = () => {
         <CassetteModel />
       }
       <h1 className="fixed top-0 text-4xl p-8">Classic Tape</h1>
-      <div className="fixed p-8 bg-blue-500 bottom-0 m-8">
+      <div className="fixed p-8 bg-blue-400 bottom-0 m-8">
         <div className="grid grid-cols-4">
           <div className="flex flex-col text-sm pr-8 border-r border-black">
             <p className="font-bold">You currently own this tape.</p>
