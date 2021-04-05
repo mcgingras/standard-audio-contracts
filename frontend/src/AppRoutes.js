@@ -11,7 +11,6 @@ import { NoWalletDetected } from "./components/NoWalletDetected";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
-import useContract from './hooks/useContract';
 
 
 // pages
@@ -21,6 +20,7 @@ import TapeEdit from './pages/TapeEdit';
 import TapeShow from './pages/TapeShow';
 import MyTapes from './pages/MyTapes';
 import Den from './pages/Den';
+import SpotifyPlayer from "./components/SpotifyPlayer";
 
 
 const App = () => {
@@ -83,8 +83,11 @@ const App = () => {
     return (
         <Router>
             <Switch>
-                <Route path="/den">
+                <Route path="/den/:id">
                     <Den />
+                </Route>
+                <Route path="/player">
+                  <SpotifyPlayer />
                 </Route>
                 <Route path="/shelf">
                     <MyTapes />

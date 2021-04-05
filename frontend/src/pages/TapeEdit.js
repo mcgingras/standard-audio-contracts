@@ -5,12 +5,14 @@ const axios = require('axios');
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 
 const TapeEdit = ({contract}) => {
+
+  const [title, setTitle] = useState('');
   const [token, setToken] = useState('');
   const [isLoggedIn, setLoggedIn] = useState(false);
   const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 500);
   const [tracks, setTracks] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const debouncedQuery = useDebounce(query, 500);
   const [songs, setSongs] = useState([]);
   const [txHash, setTxHash] = useState(undefined);
   const [txError, setTxError] = useState(undefined);
@@ -56,9 +58,18 @@ const TapeEdit = ({contract}) => {
     let songData = {
         id: song.id,
         name: song.name,
+        uri: song.uri,
         artists: song.artists.map((artist) => artist.name).join(', ')
     }
     setSongs([...songs, songData])
+  }
+
+  const saveTape = (event) => {
+    console.log(title);
+    console.log(songs);
+
+    const payload = { title, songs }
+    console.log(payload);
   }
 
   const mintNFT = async (event) => {
@@ -78,57 +89,57 @@ const TapeEdit = ({contract}) => {
 }
 
 const mintToken = async (to, uri) => {
-        try {
-              const tx = await contract.createMixtape(to, uri);
-              setTxHash(tx.hash);
+    try {
+          const tx = await contract.createMixtape(to, uri);
+          setTxHash(tx.hash);
 
-              const receipt = await tx.wait();
-                if (receipt.status === 0) {
-                    throw new Error("Transaction failed");
-                }
+          const receipt = await tx.wait();
+            if (receipt.status === 0) {
+                throw new Error("Transaction failed");
+            }
 
-          } catch (error) {
-              console.log(error);
-              if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-                return;
-              }
-              setTxError(error);
-          } finally {
-            setTxBeingSent(undefined);
+      } catch (error) {
+          console.log(error);
+          if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+            return;
           }
-    }
+          setTxError(error);
+      } finally {
+        setTxBeingSent(undefined);
+      }
+}
 
   return (
-    <div class="bg-gray-800 text-white">
-      <div class="container mx-auto min-h-screen">
+    <div className="bg-gray-800 text-white">
+      <div className="container mx-auto min-h-screen">
       { !isLoggedIn
         ?
           <>
-          <div class="pt-16 mb-8 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Configure Cassette</h1>
-            <Link to="/tape/4" class="uppercase text-sm">Back to Viewer</Link>
+          <div className="pt-16 mb-8 flex justify-between items-center">
+            <h1 className="text-2xl font-bold">Configure Cassette</h1>
+            <Link to="/tape/4" className="uppercase text-sm">Back to Viewer</Link>
           </div>
-          <div class="flex flex-col">
-            <span class="bg-gray-700 p-16 text-center rounded-md">NFTapes requires you have Spotify account to add and listen to songs from cassettes. Please login.</span>
-            <button class="bg-green-300 hover:bg-green-400 text-gray-900 self-start px-4 py-2 rounded-full mx-auto mt-8"><a href="http://localhost:8888/login">Log into Spotify</a></button>
+          <div className="flex flex-col">
+            <span className="bg-gray-700 p-16 text-center rounded-md">NFTapes requires you have Spotify account to add and listen to songs from cassettes. Please login.</span>
+            <button className="bg-green-300 hover:bg-green-400 text-gray-900 self-start px-4 py-2 rounded-full mx-auto mt-8"><a href="http://localhost:8888/login">Log into Spotify</a></button>
           </div>
           </>
         :
         <>
-        <div class="pt-16 mb-8 flex justify-between items-center">
-          <h1 class="text-2xl font-bold">Configure Cassette</h1>
-          <Link to="/tape/4" class="uppercase text-sm">Back to Viewer</Link>
+        <div className="pt-16 mb-8 flex justify-between items-center">
+          <h1 className="text-2xl font-bold">Configure Cassette</h1>
+          <Link to="/tape/4" className="uppercase text-sm">Back to Viewer</Link>
         </div>
 
-        <section class="grid grid-cols-2 gap-8 mb-12">
+        <section className="grid grid-cols-2 gap-8 mb-12">
           <div>
-            <div class="flex flex-col mb-8">
-              <label class="mb-2">Cassette Title</label>
-              <input type="text" class="rounded-md px-4 py-2 text-gray-900" placeholder="title" />
+            <div className="flex flex-col mb-8">
+              <label className="mb-2">Cassette Title</label>
+              <input type="text" onChange={(e) => {setTitle(e.target.value)}} className="rounded-md px-4 py-2 text-gray-900" placeholder="title" />
             </div>
 
             <div>
-              <label class="mb-2 block">Tracklist</label>
+              <label className="mb-2 block">Tracklist</label>
               <ul>
                 {songs.map((result, index) => (
                   <li key={result.id} className="bg-gray-700 p-4 rounded-md block mb-4">
@@ -141,16 +152,16 @@ const mintToken = async (to, uri) => {
           </div>
 
           <div>
-            <div class="flex flex-col">
-              <label class="mb-2">Add Songs</label>
+            <div className="flex flex-col">
+              <label className="mb-2">Add Songs</label>
               <input
                 type="text"
-                class="rounded-lg px-4 py-2 text-gray-900"
+                className="rounded-lg px-4 py-2 text-gray-900"
                 placeholder="search"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
               />
-              {isSearching && <div class="bg-white">Searching ...</div>}
+              {isSearching && <div className="bg-white">Searching ...</div>}
               { query &&
               <div className="bg-white border rounded-b-lg shadow-md max-h-96 overflow-scroll rounded-b-lg">
                   {tracks.map(result => (
@@ -164,8 +175,8 @@ const mintToken = async (to, uri) => {
                   ))}
               </div>
               }
-              <div class="mt-8 self-end">
-                <button class="bg-green-300 hover:bg-green-400 text-gray-900 px-4 py-2 rounded-full">Create Cassette</button>
+              <div className="mt-8 self-end">
+                <button className="bg-green-300 hover:bg-green-400 text-gray-900 px-4 py-2 rounded-full" onClick={(e) => {saveTape(e)}}>Create Cassette</button>
               </div>
             </div>
           </div>

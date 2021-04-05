@@ -37,7 +37,7 @@ app.get('/callback', function (req, res) {
     }
     request.post(authOptions, function (error, response, body) {
         var access_token = body.access_token
-        uri = 'http://localhost:3002/new'
+        uri = 'http://localhost:3002/tapes/1/edit/'
         res.redirect(uri + '?access_token=' + access_token)
     })
 })

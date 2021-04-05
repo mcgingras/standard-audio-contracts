@@ -58,6 +58,20 @@ const attributes = {
 
 }
 
+const songInterface = {
+  id: "4vF5CLuFgNo6o3Rt2FrNoA",
+  name: "Bad Boys Running Wild",
+  uri: "spotify:track:6UWWzTU1NgKf7vHbOeO17p",
+  artists: "Scintillante"
+}
+
+const songInterface2 = {
+  id: "null",
+  name: "The Zoo",
+  uri: "spotify:track:0YpmF3aZXOIuyi8itZbpkp",
+  artists: "Scorpions"
+}
+
 const createTapes = (amt) => {
   let tapes = [];
   for (let i = 0; i < amt; i++) {
@@ -75,7 +89,8 @@ const createTape = (i) => {
     price: 1.2,
     bids: [],
     colorMap: randColorMap(),
-    attributes: attributes
+    attributes: attributes,
+    songs: [songInterface, songInterface2]
   }
 
   return tape
@@ -83,7 +98,7 @@ const createTape = (i) => {
 
 let tapes = createTapes(12);
 
-// mocking this
+
 app.get('/tapes', function (req, res) {
   res.status(200).send({
     tapes: tapes

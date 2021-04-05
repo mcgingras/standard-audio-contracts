@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import CassetteModel from '../components/CassetteModel';
-import Demo from '../components/three/Demo';
 import TextureCassette from '../components/three/Tester-dimension-casette';
 
 const demoStats = {
