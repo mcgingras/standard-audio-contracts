@@ -14,11 +14,9 @@
         "react-dom": "^16.13.1",
         "react-router-dom": "^5.2.0",
         "react-scripts": "3.4.1",
-        "react-spotify-web-playback": "^0.8.1",
         "react-three-fiber": "^5.3.19",
         "react-three-gui": "^0.4.2",
         "three": "^0.126.1",
-        "valtio": "^1.0.0",
         "web3modal": "^1.9.3"
     },
     "scripts": {
