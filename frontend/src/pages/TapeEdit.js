@@ -50,6 +50,7 @@ const TapeEdit = ({contract}) => {
 
     if (c) {
       setLoggedIn(true);
+      localStorage.setItem('spotify_token', c);
       setToken(c);
     }
   }, []);

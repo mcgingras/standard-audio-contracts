@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import SpotifyPlayer from 'react-spotify-web-playback';
+import SpotifyPlayer from "../components/SpotifyPlayer";
+import {next, previous, play} from '../spotify';
 
 const Den = () => {
+  const savedToken = localStorage.getItem('spotify_token');
   const [tape, setTape] = useState(undefined);
   const [uris, setUris] = useState([]);
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState(savedToken || "");
   const [isLoggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -17,6 +19,10 @@ const Den = () => {
   }, [])
 
   useEffect(() => {
+    if (token) {
+      setLoggedIn(true);
+    }
+    else {
     let urlstring = window.location.href;
     let url = new URL(urlstring);
     let c = url.searchParams.get('access_token');
@@ -26,6 +32,7 @@ const Den = () => {
       setLoggedIn(true);
       setToken(c);
     }
+  }
   }, []);
 
   useEffect(() => {
@@ -43,16 +50,12 @@ const Den = () => {
           :
           <div className="grid grid-cols-4 h-screen">
             <div className="col-span-3 bg-yellow-500">
-              <SpotifyPlayer
-                token={token}
-                uris={uris}
-              />
+              <SpotifyPlayer uris={uris} />
             </div>
-
             { tape &&
               <div className="col-span-1 bg-gray-900 p-4">
                 <h2 className="text-white text-2xl">{ tape.songs[0].name}</h2>
-                <button onClick={() => {next(token)}}>next</button>
+                <button className="text-white" onClick={() => {next(token)}}>next</button>
               </div>
             }
           </div>
@@ -68,14 +71,4 @@ const fetchTapes = (id) => {
     method: 'GET'
   })
   .then(res => res.json())
-}
-
-async function next(token) {
-  return fetch(`https://api.spotify.com/v1/me/player/next`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-  });
 }
