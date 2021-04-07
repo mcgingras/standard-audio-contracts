@@ -49,7 +49,6 @@ const App = () => {
 
     useEffect(() => {
       if (web3Modal.cachedProvider) {
-        console.log("cached")
         loadWeb3Modal();
       }
     }, [loadWeb3Modal]);
@@ -58,7 +57,6 @@ const App = () => {
       const getSigner = async () => {
         if (injectedProvider) {
           const signer = injectedProvider.getSigner();
-          console.log(signer)
           let addr = await signer.getAddress();
           setAdress(addr);
 

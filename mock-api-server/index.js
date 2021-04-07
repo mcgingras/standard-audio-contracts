@@ -72,6 +72,13 @@ const songInterface2 = {
   artists: "Scorpions"
 }
 
+const songInterface3 = {
+  id: "null",
+  name: "Jump Out the Window",
+  artists: "Big Sean",
+  uri: "spotify:track:1jQsKN68yE94tMYml0wHMd"
+}
+
 const createTapes = (amt) => {
   let tapes = [];
   for (let i = 0; i < amt; i++) {
@@ -90,7 +97,7 @@ const createTape = (i) => {
     bids: [],
     colorMap: randColorMap(),
     attributes: attributes,
-    songs: [songInterface, songInterface2]
+    songs: [songInterface, songInterface2, songInterface3]
   }
 
   return tape

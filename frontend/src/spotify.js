@@ -1,7 +1,6 @@
 // spotify helper functions
 
 export const play = async (uris, deviceId, token) => {
-  console.log("are we playing")
   const body = JSON.stringify({ uris, offset: { position: 0 } });
   return fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
       body,
@@ -57,7 +56,6 @@ export const seek = async (position, token) => {
 }
 
 export const getDevices = async (token) => {
-  console.log("are we getting the devices")
   return fetch(`https://api.spotify.com/v1/me/player/devices`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -65,4 +63,21 @@ export const getDevices = async (token) => {
     },
     method: 'GET',
   }).then((d) => d.json());
+}
+
+
+export const getPlaybackState = async (token) => {
+  return fetch(`https://api.spotify.com/v1/me/player`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    method: 'GET',
+  }).then((d) => {
+    if (d.status === 204) {
+      return null;
+    }
+
+    return d.json();
+  });
 }

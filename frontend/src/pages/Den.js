@@ -13,7 +13,6 @@ const Den = () => {
     let id = window.location.pathname.substring(window.location.pathname.length - 1)
     fetchTapes(id)
     .then(results => {
-      console.log(results);
       setTape(results);
     })
   }, [])
@@ -49,12 +48,16 @@ const Den = () => {
           <div>you need to be logged in</div>
           :
           <div className="grid grid-cols-4 h-screen">
-            <div className="col-span-3 bg-yellow-500">
-              <SpotifyPlayer uris={uris} />
+            <div className="col-span-3 bg-yellow-500 relative">
+              <div className="absolute bottom-0 w-full p-2">
+                <SpotifyPlayer uris={uris} />
+              </div>
             </div>
             { tape &&
               <div className="col-span-1 bg-gray-900 p-4">
                 <h2 className="text-white text-2xl">{ tape.songs[0].name}</h2>
+                <h3 className="text-white">{ tape.songs[0].artists}</h3>
+                <p class="text-gray-200 font-bold mt-12">Up Next</p>
                 <button className="text-white" onClick={() => {next(token)}}>next</button>
               </div>
             }
