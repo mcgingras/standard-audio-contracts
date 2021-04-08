@@ -49,7 +49,7 @@ const Den = () => {
           :
           <div className="grid grid-cols-4 h-screen">
             <div className="col-span-3 bg-yellow-500 relative">
-              <div className="absolute bottom-0 w-full p-2">
+              <div className="absolute bottom-0 w-full px-8 py-4">
                 <SpotifyPlayer uris={uris} />
               </div>
             </div>

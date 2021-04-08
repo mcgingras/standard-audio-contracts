@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { play, next, previous, pause, seek, getDevices, getPlaybackState } from '../spotify';
 
 const SpotifyPlayer = ({uris}) => {
@@ -9,6 +9,23 @@ const SpotifyPlayer = ({uris}) => {
   const [deviceId, setDeviceId] = useState(undefined);
   const [devices, setDevices] = useState(undefined);
   const [initializing, setInitializing] = useState(true);
+
+  const [scrubPb, setScrubPb] = useState(null);
+  const [playback, setPlayback] = useState(0);
+  const [playbackState, setPlaybackState] = useState({
+		play: false,
+		shuffle: false,
+		repeat: false,
+		progress: 0,
+		total_time: 0,
+	});
+
+  const [playInfo, setPlayInfo] = useState({
+		album: {},
+		artists: [],
+		name: "",
+		id: "",
+	});
 
   // range slider
   const [songProgress, setSongProgress] = useState(0);
@@ -27,10 +44,30 @@ const SpotifyPlayer = ({uris}) => {
     player.addListener('playback_error', ({ message }) => { console.error(message); });
 
     // Playback status updates
-    player.addListener('player_state_changed', state => {
-      console.log(state);
-      initializeState(state);
-    });
+    // player.addListener('player_state_changed', state => {
+    //   console.log(state);
+    //   initializeState(state);
+    // });
+
+    player.addListener("player_state_changed", (state) => {
+			console.log(state);
+			try {
+				const { current_track } = state.track_window;
+
+				setPlayInfo(current_track);
+				setPlayback(state.position / state.duration);
+				setPlaybackState((state) => ({
+					...state,
+					play: !state.paused,
+					shuffle: state.shuffle,
+					repeat: state.repeat_mode !== 0,
+					progress: state.position,
+					total_time: state.duration,
+				}));
+			} catch (error) {
+				console.log(error);
+			}
+		});
 
     // Ready
     player.addListener('ready', ({ device_id }) => { handlePlayerStatus(device_id) });
@@ -40,9 +77,30 @@ const SpotifyPlayer = ({uris}) => {
 
     // Connect to the player
     player.connect();
-    console.log(player);
-
     setPlayer(player);
+  }
+
+  const togglePlay = async () => {
+    const response = await play(uris, deviceId, token);
+
+    if (response.status === 204) {
+      setPlaybackState((state) => ({ ...state, play: !state.play }));
+      updatePlayback();
+    } else {
+      // setError("error")
+    }
+  }
+
+  const updatePlayback = () => {
+    const interval = 500 / playbackState.total_time;
+    setPlayback((playback) => playback + interval);
+    setPlaybackState((state) => ({...state, progress: state.progress + 500}))
+
+    if (playbackState.play) {
+      setTimeout(() => {
+        updatePlayback()
+      }, 500);
+    }
   }
 
   const handlePlayerStatus = async (device_id) => {
@@ -53,13 +111,32 @@ const SpotifyPlayer = ({uris}) => {
     // status: device_id ? STATUS.READY : STATUS.IDLE,
   }
 
+  const seekPlayback = async (ratio) => {
+		const time = Math.round(ratio * playbackState.total_time);
+    const response = await seek(time)
+
+    if (response.status === 204) {
+      setPlayback(ratio);
+      setPlaybackState((state) => ({ ...state, progress: time }));
+      // updateState();
+    } else {
+      // setError
+    }
+
+		setScrubPb(null);
+	};
+
+	const scrubPlayback = (ratio) => {
+		const time = ratio * playbackState.total_time;
+		setScrubPb(time);
+	};
+
   const initializeDevices = async (id) => {
     const {devices} = await getDevices(token);
     return { id, devices }
   }
 
   const initializeState = (state) => {
-
     const progressSong = (val, duration) => {
       if (val < duration) {
         setSongProgress(val);
@@ -73,13 +150,6 @@ const SpotifyPlayer = ({uris}) => {
       setSongLength(state.duration);
       progressSong(state.position, state.duration);
     }
-
-  }
-
-  const getState = async () => {
-    const state = await getPlaybackState(token);
-    setSongProgress(state.progress_ms);
-    setSongLength(state.item.duration_ms);
   }
 
 
@@ -96,15 +166,15 @@ const SpotifyPlayer = ({uris}) => {
     <div>
       {
         !initializing &&
-        <div class="flex">
+        <div class="flex items-center">
           <button className="text-white mr-2" onClick={() => {previous(token)}}>
             <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
               <path d="M29.09 53.749V5.819H5.819v116.363h23.273v-47.93L122.18 128V0z" fill="currentColor" />
             </svg>
           </button>
-          { !isPlaying
+          { !playbackState.play
             ?
-            <button className="border rounded-full border-white p-4 text-white flex" onClick={() => { play(uris, deviceId, token); setIsPlaying(true); }}>
+            <button className="border rounded-full border-white p-4 text-white flex" onClick={() => { togglePlay() }}>
               <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
                 <path d="M119.351 64L8.65 0v128z" fill="currentColor" />
               </svg>
@@ -125,14 +195,90 @@ const SpotifyPlayer = ({uris}) => {
             </svg>
           </button>
 
-          {/* <button onClick={() => { getState() }}>
-            state
-          </button> */}
-
-          <input class="flex-grow" type="range" value={songProgress} min={0} max={songLength} />
+          <ProgressBar
+            value={playback}
+            setValue={(ratio) => seekPlayback(ratio)}
+            scrubFunction={scrubPlayback}
+          />
         </div>
 
       }
+    </div>
+  )
+}
+
+const ProgressBar = ({value, setValue, scrubFunction}) => {
+  const [engage, setEngage] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [scrub, setScrub] = useState(null)
+
+  const wrapperRef = useRef(null)
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+        window.removeEventListener('mousemove', handleMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+    }
+  })
+
+  const handleMouseUp = (e) => {
+    setIsDragging(false)
+    if (engage){
+      setValue(scrub)
+    }
+    setScrub(null)
+    if (!e.target.classList.contains('progress-wrapper') &&
+        !e.target.classList.contains('progress-bar') &&
+        !e.target.classList.contains('progress') &&
+        !e.target.classList.contains('progress-slider')) {
+        setEngage(false)
+    }
+  }
+
+  const handleMove = (e) => {
+      if (engage && isDragging) {
+          const rect = wrapperRef.current.getBoundingClientRect()
+          let offsetRatio = (e.pageX - rect.x)/rect.width
+
+          if (offsetRatio < 0){
+              offsetRatio = 0.001
+          } else if (offsetRatio > 1){
+            offsetRatio = 1
+          }
+
+          if(scrubFunction){
+              scrubFunction(offsetRatio)
+          }
+          setScrub(offsetRatio)
+      }
+  }
+
+  const handleEnter = () => {
+    setEngage(true)
+  }
+
+  const handleLeave = () => {
+    if (!isDragging){
+      setEngage(false)
+    }
+  }
+
+  const handleMouseDown = (e) => {
+      setIsDragging(true)
+      const rect = wrapperRef.current.getBoundingClientRect()
+      const offsetRatio = (e.pageX - rect.x)/rect.width
+      setScrub(offsetRatio)
+  }
+
+  return (
+    <div ref={wrapperRef} className="flex items-center h-4 w-full relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave} onMouseDown={handleMouseDown}>
+        <div className="bg-yellow-700 rounded-sm flex h-1 w-full overflow-hidden" >
+            <div className="bg-white h-1 w-full rounded-sm" style={{transform: `translate(-${((1-(scrub || value))*100).toFixed(2)}%)`}} ></div>
+        </div>
+        <button className="bg-white rounded-lg w-3 h-3 z-5 shadow-md absolute left-0" style={{left: `${((scrub || value)*100).toFixed(2)}%`}} ></button>
     </div>
   )
 }
