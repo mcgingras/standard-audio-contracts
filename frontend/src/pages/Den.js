@@ -57,7 +57,7 @@ const Den = () => {
               <div className="col-span-1 bg-gray-900 p-4">
                 <h2 className="text-white text-2xl">{ tape.songs[0].name}</h2>
                 <h3 className="text-white">{ tape.songs[0].artists}</h3>
-                <p class="text-gray-200 font-bold mt-12">Up Next</p>
+                <p className="text-gray-200 font-bold mt-12">Up Next</p>
                 <button className="text-white" onClick={() => {next(token)}}>next</button>
               </div>
             }

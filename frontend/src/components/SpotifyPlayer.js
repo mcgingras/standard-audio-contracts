@@ -4,8 +4,6 @@ import { play, next, previous, pause, seek, getDevices, getPlaybackState } from 
 const SpotifyPlayer = ({uris}) => {
   const savedToken = localStorage.getItem('spotify_token');
   const [token, setToken] = useState(savedToken || "");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [player, setPlayer] = useState(undefined);
   const [deviceId, setDeviceId] = useState(undefined);
   const [devices, setDevices] = useState(undefined);
   const [initializing, setInitializing] = useState(true);
@@ -27,10 +25,6 @@ const SpotifyPlayer = ({uris}) => {
 		id: "",
 	});
 
-  // range slider
-  const [songProgress, setSongProgress] = useState(0);
-  const [songLength, setSongLength] = useState(10);
-
   const initializePlayer = () => {
     const player = new window.Spotify.Player({
       getOAuthToken: (cb) => {
@@ -43,26 +37,20 @@ const SpotifyPlayer = ({uris}) => {
     player.addListener('account_error', ({ message }) => { console.error(message); });
     player.addListener('playback_error', ({ message }) => { console.error(message); });
 
-    // Playback status updates
-    // player.addListener('player_state_changed', state => {
-    //   console.log(state);
-    //   initializeState(state);
-    // });
-
-    player.addListener("player_state_changed", (state) => {
-			console.log(state);
+    player.addListener("player_state_changed", (player_state) => {
+			console.log(player_state);
 			try {
-				const { current_track } = state.track_window;
+				const { current_track } = player_state.track_window;
 
 				setPlayInfo(current_track);
-				setPlayback(state.position / state.duration);
-				setPlaybackState((state) => ({
-					...state,
-					play: !state.paused,
-					shuffle: state.shuffle,
-					repeat: state.repeat_mode !== 0,
-					progress: state.position,
-					total_time: state.duration,
+				setPlayback(player_state.position / player_state.duration);
+				setPlaybackState((playback_state) => ({
+					...playback_state,
+					play: !player_state.paused,
+					shuffle: player_state.shuffle,
+					repeat: player_state.repeat_mode !== 0,
+					progress: player_state.position,
+					total_time: player_state.duration,
 				}));
 			} catch (error) {
 				console.log(error);
@@ -77,30 +65,33 @@ const SpotifyPlayer = ({uris}) => {
 
     // Connect to the player
     player.connect();
-    setPlayer(player);
   }
 
   const togglePlay = async () => {
     const response = await play(uris, deviceId, token);
 
-    if (response.status === 204) {
-      setPlaybackState((state) => ({ ...state, play: !state.play }));
-      updatePlayback();
-    } else {
+    if (!response.status === 204) {
       // setError("error")
     }
   }
 
-  const updatePlayback = () => {
-    const interval = 500 / playbackState.total_time;
-    setPlayback((playback) => playback + interval);
-    setPlaybackState((state) => ({...state, progress: state.progress + 500}))
+  // start the update playback loop only once
+  // the play state has triggered
+  useEffect(() => {
+    updatePlayback();
+  }, [playbackState.play])
 
-    if (playbackState.play) {
-      setTimeout(() => {
-        updatePlayback()
-      }, 500);
-    }
+  const updatePlayback = () => {
+    setTimeout(() => {
+      const interval = 500 / playbackState.total_time;
+      console.log(interval);
+      setPlayback((playback) => playback + interval);
+      setPlaybackState((state) => ({...state, progress: state.progress + 500}))
+
+      if (playbackState.play) {
+      updatePlayback()
+      }
+    }, 500);
   }
 
   const handlePlayerStatus = async (device_id) => {
@@ -112,8 +103,11 @@ const SpotifyPlayer = ({uris}) => {
   }
 
   const seekPlayback = async (ratio) => {
+    console.log(ratio);
+    console.log(playbackState);
+
 		const time = Math.round(ratio * playbackState.total_time);
-    const response = await seek(time)
+    const response = await seek(time, token);
 
     if (response.status === 204) {
       setPlayback(ratio);
@@ -136,23 +130,6 @@ const SpotifyPlayer = ({uris}) => {
     return { id, devices }
   }
 
-  const initializeState = (state) => {
-    const progressSong = (val, duration) => {
-      if (val < duration) {
-        setSongProgress(val);
-        setTimeout(() => {
-          progressSong(val+1000, duration);
-        }, 1000);
-      }
-    }
-
-    if (!state.paused) {
-      setSongLength(state.duration);
-      progressSong(state.position, state.duration);
-    }
-  }
-
-
   useEffect(() => {
     if (!window.onSpotifyWebPlaybackSDKReady) {
       window.onSpotifyWebPlaybackSDKReady = initializePlayer;
@@ -166,7 +143,7 @@ const SpotifyPlayer = ({uris}) => {
     <div>
       {
         !initializing &&
-        <div class="flex items-center">
+        <div className="flex items-center">
           <button className="text-white mr-2" onClick={() => {previous(token)}}>
             <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
               <path d="M29.09 53.749V5.819H5.819v116.363h23.273v-47.93L122.18 128V0z" fill="currentColor" />
@@ -180,7 +157,7 @@ const SpotifyPlayer = ({uris}) => {
               </svg>
             </button>
             :
-            <button className="border rounded-full border-white p-4 text-white flex" onClick={() => { pause(token); setIsPlaying(false); }}>
+            <button className="border rounded-full border-white p-4 text-white flex" onClick={() => { pause(token) }}>
               <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
                 <path d="M41.86 128V0H8.648v128h33.21zm77.491 0V0h-33.21v128h33.21z" fill="currentColor" />
               </svg>
@@ -194,14 +171,13 @@ const SpotifyPlayer = ({uris}) => {
               />
             </svg>
           </button>
-
+          {/* <button onClick={() => {console.log(playbackState)}}>see state</button> */}
           <ProgressBar
             value={playback}
             setValue={(ratio) => seekPlayback(ratio)}
             scrubFunction={scrubPlayback}
           />
         </div>
-
       }
     </div>
   )
