@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { play, next, previous, pause, seek, getDevices, getPlaybackState } from '../spotify';
 
-const SpotifyPlayer = ({uris}) => {
+const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
   const savedToken = localStorage.getItem('spotify_token');
   const [token, setToken] = useState(savedToken || "");
   const [deviceId, setDeviceId] = useState(undefined);
@@ -38,8 +38,10 @@ const SpotifyPlayer = ({uris}) => {
     player.addListener('playback_error', ({ message }) => { console.error(message); });
 
     player.addListener("player_state_changed", (player_state) => {
-			console.log(player_state);
+      console.log(player_state.track_window);
 			try {
+        setActiveTrack(player_state.track_window.current_track)
+
 				const { current_track } = player_state.track_window;
 
 				setPlayInfo(current_track);
@@ -73,6 +75,16 @@ const SpotifyPlayer = ({uris}) => {
     if (!response.status === 204) {
       // setError("error")
     }
+  }
+
+  const togglePrevious = async () => {
+    const response = await previous(token)
+    setCurrentTrackIndex((index) => index + - 1)
+  }
+
+  const toggleNext = async () => {
+    const response = await next(token)
+    setCurrentTrackIndex((index) => index + 1)
   }
 
   // start the update playback loop only once
@@ -144,7 +156,7 @@ const SpotifyPlayer = ({uris}) => {
       {
         !initializing &&
         <div className="flex items-center">
-          <button className="text-white mr-2" onClick={() => {previous(token)}}>
+          <button className="text-white mr-2" onClick={() => { togglePrevious() }}>
             <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
               <path d="M29.09 53.749V5.819H5.819v116.363h23.273v-47.93L122.18 128V0z" fill="currentColor" />
             </svg>
@@ -163,7 +175,7 @@ const SpotifyPlayer = ({uris}) => {
               </svg>
             </button>
           }
-          <button className="text-white mx-2" onClick={() => {next(token)}}>
+          <button className="text-white mx-2" onClick={() => { toggleNext() }}>
             <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
               <path
                 d="M98.91 53.749L5.817 0v128L98.91 74.251v47.93h23.273V5.819H98.909z"
@@ -172,11 +184,19 @@ const SpotifyPlayer = ({uris}) => {
             </svg>
           </button>
           {/* <button onClick={() => {console.log(playbackState)}}>see state</button> */}
+          <div className="text-white text-xs mr-1" draggable="false">
+            {scrubPb
+              ? msTimeFormat(scrubPb)
+              : msTimeFormat(playbackState.progress)}
+					</div>
           <ProgressBar
             value={playback}
             setValue={(ratio) => seekPlayback(ratio)}
             scrubFunction={scrubPlayback}
           />
+          <div className="text-white text-xs ml-1" draggable="false">
+						{msTimeFormat(playbackState.total_time)}
+					</div>
         </div>
       }
     </div>
@@ -257,6 +277,14 @@ const ProgressBar = ({value, setValue, scrubFunction}) => {
         <button className="bg-white rounded-lg w-3 h-3 z-5 shadow-md absolute left-0" style={{left: `${((scrub || value)*100).toFixed(2)}%`}} ></button>
     </div>
   )
+}
+
+function msTimeFormat(ms){
+  const s = Math.floor(ms/1000)
+  const min = Math.floor(s /60)
+  const sec = (s - min*60)
+
+  return `${min}:${sec < 10? `0${sec}`: sec}`
 }
 
 export default SpotifyPlayer;

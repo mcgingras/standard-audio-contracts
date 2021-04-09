@@ -79,6 +79,31 @@ const songInterface3 = {
   uri: "spotify:track:1jQsKN68yE94tMYml0wHMd"
 }
 
+const songInterface4 = {
+  name: "Cardigan",
+  artists: "Dom Toliver",
+  uri: "spotify:track:0Li1OuXXfi7950ilZUFGkF"
+}
+
+const songInterface5 = {
+  name: "Glad You Exist",
+  artists: "Dan and Shay",
+  uri: "spotify:track:472vIK1ldetTxRxG3ovaiY"
+}
+
+const songInterface6 = {
+  name: "Go Crazy",
+  artists: "Chris Brown & Young Thug",
+  uri: "spotify:track:1IIKrJVP1C9N7iPtG6eOsK"
+}
+
+const songInterface7 = {
+  name: "Gravity",
+  artists: "DJ Dahi",
+  uri: "spotify:track:6u3CPnFMKANYgfdiifFOiJ"
+}
+
+
 const createTapes = (amt) => {
   let tapes = [];
   for (let i = 0; i < amt; i++) {
@@ -97,7 +122,7 @@ const createTape = (i) => {
     bids: [],
     colorMap: randColorMap(),
     attributes: attributes,
-    songs: [songInterface, songInterface2, songInterface3]
+    songs: [songInterface, songInterface2, songInterface3, songInterface4, songInterface5, songInterface6, songInterface7]
   }
 
   return tape

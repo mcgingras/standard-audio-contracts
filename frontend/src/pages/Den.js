@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import SpotifyPlayer from "../components/SpotifyPlayer";
-import {next, previous, play} from '../spotify';
 
 const Den = () => {
   const savedToken = localStorage.getItem('spotify_token');
@@ -8,6 +7,10 @@ const Den = () => {
   const [uris, setUris] = useState([]);
   const [token, setToken] = useState(savedToken || "");
   const [isLoggedIn, setLoggedIn] = useState(false);
+
+  const [activeTrack, setActiveTrack] = useState(null)
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+
 
   useEffect(() => {
     let id = window.location.pathname.substring(window.location.pathname.length - 1)
@@ -50,17 +53,46 @@ const Den = () => {
           <div className="grid grid-cols-4 h-screen">
             <div className="col-span-3 bg-yellow-500 relative">
               <div className="absolute bottom-0 w-full px-8 py-4">
-                <SpotifyPlayer uris={uris} />
+                <SpotifyPlayer uris={uris} setActiveTrack={setActiveTrack} setCurrentTrackIndex={setCurrentTrackIndex} />
               </div>
             </div>
-            { tape &&
+
               <div className="col-span-1 bg-gray-900 p-4">
-                <h2 className="text-white text-2xl">{ tape.songs[0].name}</h2>
-                <h3 className="text-white">{ tape.songs[0].artists}</h3>
-                <p className="text-gray-200 font-bold mt-12">Up Next</p>
-                <button className="text-white" onClick={() => {next(token)}}>next</button>
+              {
+                tape && activeTrack &&
+                <>
+                  {
+                    tape.songs.slice(currentTrackIndex-1, currentTrackIndex).map((tape) => {
+                      return (
+                        <div className="p-4 bg-gray-700 text-white rounded mb-4">
+                          <span className="font-bold text-sm">{ tape.name }</span>
+                          <span className="text-sm">- { tape.artists }</span>
+                        </div>
+                      )
+                    })
+                  }
+                  <h2 className="text-white text-2xl font-bold">{ activeTrack.name }</h2>
+                  <div className="grid grid-cols-2 gap-4 mt-4">
+                    <img src={activeTrack.album.images[0].url} />
+                    <div className="flex flex-col">
+                      <span className="text-white text-sm">{activeTrack.artists[0].name}</span>
+                      <span className="text-white text-sm">{activeTrack.album.name}</span>
+                    </div>
+                  </div>
+                  <p className="text-gray-200 font-bold mt-12 mb-4">Up Next</p>
+                  {
+                    tape.songs.slice(currentTrackIndex+1).map((tape) => {
+                      return (
+                        <div className="p-4 bg-gray-700 text-white rounded mb-4">
+                          <span className="font-bold text-sm">{ tape.name }</span>
+                          <span className="text-sm">- { tape.artists }</span>
+                        </div>
+                      )
+                    })
+                  }
+                </>
+              }
               </div>
-            }
           </div>
         }
       </div>
