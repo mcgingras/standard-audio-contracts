@@ -8,6 +8,16 @@ const Den = () => {
   const [token, setToken] = useState(savedToken || "");
   const [isLoggedIn, setLoggedIn] = useState(false);
 
+  /**
+   * ActiveTrack:
+   * Currently playing spotify track. Object with name,
+   * artist, album, album image etc.
+   *
+   * CurrentTrackIndex:
+   * Index of currently playing track within the array of tracks
+   * pulled from the tape. Used to show which songs are up
+   * next in the right hand view.
+   */
   const [activeTrack, setActiveTrack] = useState(null)
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
 
@@ -37,6 +47,10 @@ const Den = () => {
   }
   }, []);
 
+  /**
+   * When the tape changes, we want to pull the uris from list tapes
+   * song list so we can pass just those uris to the SpotifyPlayer.
+   */
   useEffect(() => {
     if(tape){
       const uris = tape.songs.map((song) => { return song.uri })
