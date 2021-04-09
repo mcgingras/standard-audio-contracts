@@ -10,7 +10,7 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
 
   const [scrubPb, setScrubPb] = useState(null);
   const [playback, setPlayback] = useState(0);
-  const playbackState = useRef({
+  const [playbackState, setPlaybackState] = useState({
 		play: false,
 		progress: 0,
 		total_time: 0,
@@ -18,6 +18,12 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
 
   const [load, setLoad] = useState(false);
   let playerRef = useRef(null);
+
+  let [count, setCount] = useState({
+    progress: 0,
+    total_time: 0,
+    play: false
+  });
 
   //
   //
@@ -60,12 +66,19 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
     player.addListener("player_state_changed", (player_state) => {
       setActiveTrack(player_state.track_window.current_track);
       setPlayback(player_state.position / player_state.duration);
-      playbackState.current = {
+      setPlaybackState((playbackState) => ({
         ...playbackState.current,
         play: !player_state.paused,
         progress: player_state.position,
         total_time: player_state.duration,
-      }
+      }))
+
+      setCount((m) => ({
+        ...m,
+        play: !player_state.paused,
+        progress: player_state.position,
+        total_time: player_state.duration
+      }))
 		});
 
     player.addListener('ready', ({ device_id }) => { handlePlayerStatus(device_id) });
@@ -104,17 +117,18 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
       setLoad(true);
     } else {
       const response = await playerRef.current.togglePlay();
+      setPlaybackState((playbackState) => ({ ...playbackState, play: !playbackState.play }))
+      setCount((m) => ({ ...m, play: !m.play }))
+
       if (!response.status === 204) {
         setError("cannot play");
       }
-      playbackState.current = { ...playbackState.current, play: !playbackState.current.play }
     }
-		// updateState();
   }
 
   const togglePrevious = async () => {
-    const response = await previous(token)
-    setCurrentTrackIndex((index) => index + - 1)
+    const response = await previous(token);
+    setCurrentTrackIndex((index) => index + - 1);
 
     if (!response.status === 204) {
       setError("Beginning of tape - no previous songs.");
@@ -130,36 +144,31 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
     }
   }
 
-  // start the update playback loop only once
-  // the play state has triggered
-  useEffect(() => {
-    updatePlayback();
-  }, [playbackState.current.play])
+  useInterval(() => {
+    const interval = 500 / count.total_time;
+    setPlayback((playback) => playback + interval);
+    setCount((m) => ({...m, progress: m.progress + 500}))
+  }, count.play ? 500 : null)
 
-  // stuck in the loop where its not seeing the global scope of playback state when this is updated
   const updatePlayback = () => {
-    if (playbackState.current.play) {
-      setTimeout(() => {
-        const interval = 500 / playbackState.current.total_time;
-        setPlayback((playback) => playback + interval);
-        playbackState.current = { ...playbackState.current, progress: !playbackState.current.progress + 500 }
-        updatePlayback()
-      }, 500);
-    }
+    const interval = 500 / playbackState.total_time;
+    setPlayback((playback) => playback + interval);
+    console.log(playbackState.progress)
+    setPlayback((playbackState) => ({ ...playbackState, progress: playbackState.progress + 500 }))
   }
+
+  // useInterval(() => {
+  //   updatePlayback();
+  // }, playbackState.play ? 500 : null);
 
 
   const seekPlayback = async (ratio) => {
-    console.log(ratio);
-    console.log(playbackState.current);
-
-		const time = Math.round(ratio * playbackState.current.total_time);
+		const time = Math.round(ratio * playbackState.total_time);
     const response = await seek(time, token);
 
     if (response.status === 204) {
       setPlayback(ratio);
-      playbackState.current = { ...playbackState.current, progress: time }
-      // updateState();
+      setPlaybackState((playbackState) => ({ ...playbackState, progress: time }))
     } else {
       setError("Error seeking.");
     }
@@ -168,15 +177,18 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
 	};
 
 	const scrubPlayback = (ratio) => {
-		const time = ratio * playbackState.current.total_time;
+		const time = ratio * playbackState.total_time;
 		setScrubPb(time);
 	};
+
+  console.log(playback);
 
 
   return (
     <div>
+      {count.progress}
       {error}
-      {playbackState.current.progress}
+      {/* {playbackState.progress} */}
       {
         !initializing &&
         <div className="flex items-center">
@@ -186,7 +198,7 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
             </svg>
           </button>
           <button className="border rounded-full border-white p-4 text-white flex" onClick={() => { togglePlay() }}>
-            { !playbackState.current.play
+            { !playbackState.play
               ?
               <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
                 <path d="M119.351 64L8.65 0v128z" fill="currentColor" />
@@ -208,7 +220,7 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
           <div className="text-white text-xs mr-1" draggable="false">
             {scrubPb
               ? msTimeFormat(scrubPb)
-              : msTimeFormat(playbackState.current.progress)}
+              : msTimeFormat(count.progress)}
 					</div>
           <ProgressBar
             value={playback}
@@ -216,8 +228,8 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
             scrubFunction={scrubPlayback}
           />
           <div className="text-white text-xs ml-1" draggable="false">
-						{msTimeFormat(playbackState.current.total_time)}
-					</div>
+            {msTimeFormat(count.total_time)}
+          </div>
         </div>
       }
     </div>
@@ -247,11 +259,8 @@ const ProgressBar = ({value, setValue, scrubFunction}) => {
       setValue(scrub)
     }
     setScrub(null)
-    if (!e.target.classList.contains('progress-wrapper') &&
-        !e.target.classList.contains('progress-bar') &&
-        !e.target.classList.contains('progress') &&
-        !e.target.classList.contains('progress-slider')) {
-        setEngage(false)
+    if (!e.target.classList.contains('progress-slider')) {
+      setEngage(false)
     }
   }
 
@@ -291,11 +300,11 @@ const ProgressBar = ({value, setValue, scrubFunction}) => {
   }
 
   return (
-    <div ref={wrapperRef} className="flex items-center h-4 w-full relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave} onMouseDown={handleMouseDown}>
-        <div className="bg-yellow-700 rounded-sm flex h-1 w-full overflow-hidden" >
-            <div className="bg-white h-1 w-full rounded-sm" style={{transform: `translate(-${((1-(scrub || value))*100).toFixed(2)}%)`}} ></div>
+    <div ref={wrapperRef} className="progress-slider flex items-center h-4 w-full relative" onMouseEnter={handleEnter} onMouseLeave={handleLeave} onMouseDown={handleMouseDown}>
+        <div className="progress-slider bg-yellow-700 rounded-sm flex h-1 w-full overflow-hidden" >
+            <div className="progress-slider bg-white h-1 w-full rounded-sm" style={{transform: `translate(-${((1-(scrub || value))*100).toFixed(2)}%)`}} ></div>
         </div>
-        <button className="bg-white rounded-lg w-3 h-3 z-5 shadow-md absolute left-0" style={{left: `${((scrub || value)*100).toFixed(2)}%`}} ></button>
+        <button className="progress-slider bg-white rounded-lg w-3 h-3 z-5 shadow-md absolute left-0" style={{left: `${((scrub || value)*100).toFixed(2)}%`}} ></button>
     </div>
   )
 }
@@ -306,6 +315,27 @@ function msTimeFormat(ms){
   const sec = (s - min*60)
 
   return `${min}:${sec < 10? `0${sec}`: sec}`
+}
+
+
+function useInterval(callback, delay) {
+  const savedCallback = useRef();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      savedCallback.current();
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 }
 
 export default SpotifyPlayer;
