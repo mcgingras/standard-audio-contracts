@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SpotifyPlayer from "../components/SpotifyPlayer";
+import { Link } from "react-router-dom";
 
 const Den = () => {
   const savedToken = localStorage.getItem('spotify_token');
@@ -66,6 +67,10 @@ const Den = () => {
           :
           <div className="grid grid-cols-4 h-screen">
             <div className="col-span-3 bg-yellow-500 relative">
+              <div className="flex justify-between p-4">
+                <h1 className="text-white text-3xl">Crystal Watermelon</h1>
+                <Link to="/" className="bg-white rounded-full text-sm p-2 self-center">BACK</Link>
+              </div>
               <div className="absolute bottom-0 w-full px-8 py-4">
                 <SpotifyPlayer uris={uris} setActiveTrack={setActiveTrack} setCurrentTrackIndex={setCurrentTrackIndex} />
               </div>

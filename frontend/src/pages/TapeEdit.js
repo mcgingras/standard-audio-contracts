@@ -1,22 +1,32 @@
 import React, {useEffect, useState} from 'react';
 import { Link } from "react-router-dom";
+import useDebounce from '../hooks/useDebounce';
+import { useParams } from "react-router-dom";
 
 const axios = require('axios');
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 
 const TapeEdit = ({contract}) => {
+  let { id } = useParams();
 
-  const [title, setTitle] = useState('');
-  const [token, setToken] = useState('');
   const [isLoggedIn, setLoggedIn] = useState(false);
+  const [token, setToken] = useState('');
+
+  // used for state of form
+  const [title, setTitle] = useState('');
+  const [tracks, setTracks] = useState([]);
+  const [songs, setSongs] = useState([]);
+
+  // used for debounced search
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 500);
-  const [tracks, setTracks] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [songs, setSongs] = useState([]);
+
+  // used for contract interaction status
   const [txHash, setTxHash] = useState(undefined);
   const [txError, setTxError] = useState(undefined);
   const [txBeingSent, setTxBeingSent] = useState(undefined);
+
 
   const searchSpotify = (q) => {
     return fetch(`https://api.spotify.com/v1/search/?q=${q}&type=track`, {
@@ -44,14 +54,13 @@ const TapeEdit = ({contract}) => {
   );
 
   useEffect(() => {
-    let urlstring = window.location.href;
-    let url = new URL(urlstring);
-    let c = url.searchParams.get('access_token');
-
-    if (c) {
+    let token = localStorage.getItem('spotify_access_token');
+    if (token) {
       setLoggedIn(true);
-      localStorage.setItem('spotify_token', c);
-      setToken(c);
+      setToken(token);
+    } else {
+      // refresh token?
+      // force the login screen?
     }
   }, []);
 
@@ -65,24 +74,19 @@ const TapeEdit = ({contract}) => {
     setSongs([...songs, songData])
   }
 
-  const saveTape = (event) => {
-    console.log(title);
-    console.log(songs);
-
-    const payload = { title, songs }
-    console.log(payload);
-  }
-
   const mintNFT = async (event) => {
     event.preventDefault();
 
     // package form data
-    const formdata = new FormData(event.target);
-    const value = Object.fromEntries(formdata.entries());
+    const payload = { title, songs }
+    console.log(payload);
 
     // send form data off to pinata, collect ipfs hash
-    let ipfsResponse = await pinJSONToIPFS(value);
-    let hash = ipfsResponse.data.IpfsHash;
+    // let ipfsResponse = await pinJSONToIPFS(payload);
+    // let hash = ipfsResponse.data.IpfsHash;
+
+    // using this as a placeholder so we can test without having to spam pinata
+    let hash = "QmZym2n97VMJLByk3mJNgkK5kLvgxuYEMU813vmbKNc1Ga"
 
     // mint NFT to chain
     let response = await mintToken("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", hash);
@@ -91,23 +95,20 @@ const TapeEdit = ({contract}) => {
 
 const mintToken = async (to, uri) => {
     try {
-          const tx = await contract.createMixtape(to, uri);
-          setTxHash(tx.hash);
+      const tx = await contract.createMixtape(to, uri);
+      setTxHash(tx.hash);
 
-          const receipt = await tx.wait();
-            if (receipt.status === 0) {
-                throw new Error("Transaction failed");
-            }
-
-      } catch (error) {
-          console.log(error);
-          if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-            return;
-          }
-          setTxError(error);
-      } finally {
-        setTxBeingSent(undefined);
+      const receipt = await tx.wait();
+      if (receipt.status === 0) {
+          throw new Error("Transaction failed");
       }
+    } catch (error) {
+      console.log(error);
+      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) { return }
+      setTxError(error);
+    } finally {
+      setTxBeingSent(undefined);
+    }
 }
 
   return (
@@ -118,11 +119,11 @@ const mintToken = async (to, uri) => {
           <>
           <div className="pt-16 mb-8 flex justify-between items-center">
             <h1 className="text-2xl font-bold">Configure Cassette</h1>
-            <Link to="/tape/4" className="uppercase text-sm">Back to Viewer</Link>
+            <Link to="/tapes/4" className="uppercase text-sm">Back to Viewer</Link>
           </div>
           <div className="flex flex-col">
             <span className="bg-gray-700 p-16 text-center rounded-md">NFTapes requires you have Spotify account to add and listen to songs from cassettes. Please login.</span>
-            <button className="bg-green-300 hover:bg-green-400 text-gray-900 self-start px-4 py-2 rounded-full mx-auto mt-8"><a href="http://localhost:8888/login">Log into Spotify</a></button>
+            <button className="bg-green-300 hover:bg-green-400 text-gray-900 self-start px-4 py-2 rounded-full mx-auto mt-8"><a href={`http://localhost:8888/login?redirect=/tapes/${id}/edit`}>Log into Spotify</a></button>
           </div>
           </>
         :
@@ -177,7 +178,7 @@ const mintToken = async (to, uri) => {
               </div>
               }
               <div className="mt-8 self-end">
-                <button className="bg-green-300 hover:bg-green-400 text-gray-900 px-4 py-2 rounded-full" onClick={(e) => {saveTape(e)}}>Create Cassette</button>
+                <button className="bg-green-300 hover:bg-green-400 text-gray-900 px-4 py-2 rounded-full" onClick={(e) => {mintNFT(e)}}>Create Cassette</button>
               </div>
             </div>
           </div>
@@ -207,19 +208,3 @@ const pinJSONToIPFS = (JSONBody) => {
       console.log(error)
   });
 };
-
-// We could probably make this a hook instead but ah its fine for now
-function useDebounce(value, delay) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(
-    () => {
-      const handler = setTimeout(() => {
-        setDebouncedValue(value);
-      }, delay);
-
-      return () => { clearTimeout(handler) };
-    },
-    [value, delay]
-  );
-  return debouncedValue;
-}

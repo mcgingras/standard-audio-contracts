@@ -10,12 +10,6 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
 
   const [scrubPb, setScrubPb] = useState(null);
   const [playback, setPlayback] = useState(0);
-  const [playbackState, setPlaybackState] = useState({
-		play: false,
-		progress: 0,
-		total_time: 0,
-	});
-
   const [load, setLoad] = useState(false);
   let playerRef = useRef(null);
 
@@ -66,13 +60,6 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
     player.addListener("player_state_changed", (player_state) => {
       setActiveTrack(player_state.track_window.current_track);
       setPlayback(player_state.position / player_state.duration);
-      setPlaybackState((playbackState) => ({
-        ...playbackState.current,
-        play: !player_state.paused,
-        progress: player_state.position,
-        total_time: player_state.duration,
-      }))
-
       setCount((m) => ({
         ...m,
         play: !player_state.paused,
@@ -117,7 +104,6 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
       setLoad(true);
     } else {
       const response = await playerRef.current.togglePlay();
-      setPlaybackState((playbackState) => ({ ...playbackState, play: !playbackState.play }))
       setCount((m) => ({ ...m, play: !m.play }))
 
       if (!response.status === 204) {
@@ -150,25 +136,14 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
     setCount((m) => ({...m, progress: m.progress + 500}))
   }, count.play ? 500 : null)
 
-  const updatePlayback = () => {
-    const interval = 500 / playbackState.total_time;
-    setPlayback((playback) => playback + interval);
-    console.log(playbackState.progress)
-    setPlayback((playbackState) => ({ ...playbackState, progress: playbackState.progress + 500 }))
-  }
-
-  // useInterval(() => {
-  //   updatePlayback();
-  // }, playbackState.play ? 500 : null);
-
 
   const seekPlayback = async (ratio) => {
-		const time = Math.round(ratio * playbackState.total_time);
+		const time = Math.round(ratio * count.total_time);
     const response = await seek(time, token);
 
     if (response.status === 204) {
       setPlayback(ratio);
-      setPlaybackState((playbackState) => ({ ...playbackState, progress: time }))
+      setCount((c) => ({ ...c, progress: time }))
     } else {
       setError("Error seeking.");
     }
@@ -177,18 +152,14 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
 	};
 
 	const scrubPlayback = (ratio) => {
-		const time = ratio * playbackState.total_time;
+		const time = ratio * count.total_time;
 		setScrubPb(time);
 	};
-
-  console.log(playback);
 
 
   return (
     <div>
-      {count.progress}
       {error}
-      {/* {playbackState.progress} */}
       {
         !initializing &&
         <div className="flex items-center">
@@ -198,7 +169,7 @@ const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
             </svg>
           </button>
           <button className="border rounded-full border-white p-4 text-white flex" onClick={() => { togglePlay() }}>
-            { !playbackState.play
+            { !count.play
               ?
               <svg width="1em" height="1em" viewBox="0 0 128 128" preserveAspectRatio="xMidYMid">
                 <path d="M119.351 64L8.65 0v128z" fill="currentColor" />

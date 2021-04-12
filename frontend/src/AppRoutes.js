@@ -19,8 +19,11 @@ import TapeIndex from './pages/TapeIndex';
 import TapeEdit from './pages/TapeEdit';
 import TapeShow from './pages/TapeShow';
 import MyTapes from './pages/MyTapes';
+import Callback from './pages/Callback';
+
 import Den from './pages/Den';
 import SpotifyPlayer from "./components/SpotifyPlayer";
+
 
 
 const App = () => {
@@ -81,6 +84,9 @@ const App = () => {
     return (
         <Router>
             <Switch>
+                <Route path="/callback">
+                    <Callback />
+                </Route>
                 <Route path="/den/:id">
                     <Den />
                 </Route>
