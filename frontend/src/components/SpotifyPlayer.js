@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { play, next, previous, pause, seek } from '../spotify';
+import { msTimeFormat } from '../utils';
+import useInterval from '../hooks/useInterval';
 
 const SpotifyPlayer = ({ uris, setActiveTrack, setCurrentTrackIndex }) => {
   const savedToken = localStorage.getItem('spotify_token');
@@ -280,33 +282,5 @@ const ProgressBar = ({value, setValue, scrubFunction}) => {
   )
 }
 
-function msTimeFormat(ms){
-  const s = Math.floor(ms/1000)
-  const min = Math.floor(s /60)
-  const sec = (s - min*60)
-
-  return `${min}:${sec < 10? `0${sec}`: sec}`
-}
-
-
-function useInterval(callback, delay) {
-  const savedCallback = useRef();
-
-  // Remember the latest callback.
-  useEffect(() => {
-    savedCallback.current = callback;
-  }, [callback]);
-
-  // Set up the interval.
-  useEffect(() => {
-    function tick() {
-      savedCallback.current();
-    }
-    if (delay !== null) {
-      let id = setInterval(tick, delay);
-      return () => clearInterval(id);
-    }
-  }, [delay]);
-}
 
 export default SpotifyPlayer;

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useEffect} from 'react'
 
 const Callback = () => {
   let urlstring = window.location.href;
@@ -13,6 +13,7 @@ const Callback = () => {
   // definitely want to handle error case
   const getTokens = async (code, state) => {
     let tokens = await fetchAuthToken(code, state);
+    localStorage.setItem('spotify_expiration', Date.now() + 60*60*100)
     localStorage.setItem('spotify_access_token', tokens["access_token"]);
     localStorage.setItem('spotify_refresh_token', tokens["refresh_token"]);
 

@@ -1,16 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import useDebounce from '../hooks/useDebounce';
-import { useParams } from "react-router-dom";
-
-const axios = require('axios');
+import useSpotify from '../hooks/useSpotify';
+import { pinJSONToIPFS } from '../utils';
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 
 const TapeEdit = ({contract}) => {
   let { id } = useParams();
 
-  const [isLoggedIn, setLoggedIn] = useState(false);
-  const [token, setToken] = useState('');
+  // state for spotify
+  const [isLoggedIn, token] = useSpotify();
 
   // used for state of form
   const [title, setTitle] = useState('');
@@ -53,16 +52,6 @@ const TapeEdit = ({contract}) => {
     [debouncedQuery] // Only call effect if debounced search term changes
   );
 
-  useEffect(() => {
-    let token = localStorage.getItem('spotify_access_token');
-    if (token) {
-      setLoggedIn(true);
-      setToken(token);
-    } else {
-      // refresh token?
-      // force the login screen?
-    }
-  }, []);
 
   const addSong = (song) => {
     let songData = {
@@ -191,20 +180,3 @@ const mintToken = async (to, uri) => {
 }
 
 export default TapeEdit;
-
-const pinJSONToIPFS = (JSONBody) => {
-  const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
-  return axios
-  .post(url, JSONBody, {
-      headers: {
-          pinata_api_key: process.env.REACT_APP_PINATA_API_KEY,
-          pinata_secret_api_key: process.env.REACT_APP_PINATA_SECRET_KEY
-      }
-  })
-  .then(function (response) {
-      return response;
-  })
-  .catch(function (error) {
-      console.log(error)
-  });
-};

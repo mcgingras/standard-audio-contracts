@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import CassetteModel from '../components/CassetteModel';
 import TextureCassette from '../components/three/Tester-dimension-casette';
+
+import useSpotify from '../hooks/useSpotify';
 
 const demoStats = {
   "Duration": "60 Min",
@@ -24,19 +26,10 @@ const Stat = ({k, v}) => {
 const TapeShow = () => {
   const [tape, setTape] = useState(undefined);
 
-  // spotify login
-  const [loggedIn, setLoggedIn] = useState(false);
-  let { id } = useParams();
+  const [loggedIn, token] = useSpotify();
 
-  useEffect(() => {
-    let token = localStorage.getItem('spotify_access_token');
-    if (token) {
-      setLoggedIn(true);
-    } else {
-      // refresh token?
-      // force the login screen?
-    }
-  }, []);
+  // spotify login
+  let { id } = useParams();
 
   const fetchTapes = (id) => {
     return fetch(`http://localhost:1234/tape/${id}`, {
@@ -77,8 +70,19 @@ const TapeShow = () => {
             </div>
           </div>
           <div className="flex flex-col justify-between px-8 border-r border-black">
-           <p className="text-sm text-center">You need a Spotify Premium account to interact with this cassette. Please connect your account.</p>
-           <button className="bg-gray-900 px-4 py-2 text-blue-500 font-bold text-sm rounded-full">Edit Tape</button>
+            { loggedIn
+            ?
+            <>
+              <p className="text-sm text-center">Edit this cassette.</p>
+              <button className="bg-gray-900 px-4 py-2 text-blue-500 font-bold text-sm rounded-full"><Link to={`/tapes/${id}/edit`}>Edit Cassette</Link></button>
+            </>
+            :
+            <>
+              <p className="text-sm text-center">You need a Spotify Premium account to interact with this cassette. Please connect your account.</p>
+              <button className="bg-gray-900 px-4 py-2 text-blue-500 font-bold text-sm rounded-full"><a href={`http://localhost:8888/login?redirect=/tapes/${id}`}>Log into Spotify</a></button>
+            </>
+            }
+
           </div>
           <div className="flex flex-col justify-between pl-8">
             <span className="uppercase text-center text-xs">Last sold for</span>
