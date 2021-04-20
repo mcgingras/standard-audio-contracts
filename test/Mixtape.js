@@ -58,6 +58,18 @@ describe("Mixtape contract", function () {
       })
   })
 
+  describe("Editing NFT", function () {
+    it("Should allow user to edit NFT", async function() {
+      const _newURI = "updated metadata";
+
+      // are we sure this is the same mixtape as the last function call?
+      // need to verify that these are not getting whiped out each time
+      const tx = await mixtapeContract.editMixtape(0, _newURI);
+      const mixtapeURI = mixtapeContract.tokenURI(await mixtapeContract.tokenByIndex(0));
+      expect(mixtapeURI === _testURI);
+    })
+  })
+
   describe("Bidding on an NFT", function () {
       // setup bid so it is available
       beforeEach(async function() {

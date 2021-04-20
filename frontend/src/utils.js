@@ -17,6 +17,18 @@ export const pinJSONToIPFS = (JSONBody) => {
   });
 };
 
+export const getIPFSData = (hash) => {
+  const url = `https://gateway.ipfs.io/ipfs/${hash}`
+  return axios
+  .get(url)
+  .then(function (response) {
+      return response;
+  })
+  .catch(function (error) {
+      console.log(error)
+  });
+};
+
 export const msTimeFormat = (ms) => {
   const s = Math.floor(ms/1000)
   const min = Math.floor(s /60)

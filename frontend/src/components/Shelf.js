@@ -1,17 +1,5 @@
 import React, {useState, useEffect} from "react";
-import axios from 'axios';
-
-const getIPFSData = (hash) => {
-    const url = `https://gateway.ipfs.io/ipfs/${hash}`
-    return axios
-    .get(url)
-    .then(function (response) {
-        return response;
-    })
-    .catch(function (error) {
-        console.log(error)
-    });
-};
+import { getIPFSData } from '../utils';
 
 const Shelf = ({contract}) => {
     const [mixes, setMixes] = useState([]);

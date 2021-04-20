@@ -1,17 +1,21 @@
-//SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.0;
-import "hardhat/console.sol";
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity ^0.7.3;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "./IMerkleVerifier.sol";
 
-contract Mixtape is ERC721, Ownable {
+contract Mixtape is ERC721, Ownable, IMerkleVerifier {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
     uint256 public constant CASSETTE_CREATION_LIMIT = 1000;
     uint256 public cassettesCreatedCount;
+    bytes32 public immutable override merkleRoot;
+    mapping(uint256 => uint256) private claimedBitMap;
+
 
     bool public allCassettesClaimed = false;
 
@@ -52,7 +56,36 @@ contract Mixtape is ERC721, Ownable {
 
     // probably want an event for when a new token is minted?
 
-    constructor() public ERC721("CryptoCassettes", "MIX") {}
+    constructor(bytes32 merkleRoot_) public ERC721("NFTapes", "TAPE") {
+      merkleRoot = merkleRoot_;
+    }
+
+    function isClaimed(uint256 index) public view override returns (bool) {
+        uint256 claimedWordIndex = index / 256;
+        uint256 claimedBitIndex = index % 256;
+        uint256 claimedWord = claimedBitMap[claimedWordIndex];
+        uint256 mask = (1 << claimedBitIndex);
+        return claimedWord & mask == mask;
+    }
+
+    function _setClaimed(uint256 index) private {
+        uint256 claimedWordIndex = index / 256;
+        uint256 claimedBitIndex = index % 256;
+        claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
+    }
+
+    function claim(uint256 index, uint8 capacity, uint32 quality, uint32 style, bytes32[] calldata merkleProof) external override {
+        require(!isClaimed(index), 'Tape already claimed.');
+
+        bytes32 node = keccak256(abi.encodePacked(index, capacity, quality, style));
+        require(MerkleProof.verify(merkleProof, merkleRoot, node), 'Invalid proof.');
+
+        _setClaimed(index);
+        // createMixtape(msg.sender, uri, capacity, quality, style)
+        // require(IERC20(token).transfer(account, amount), 'MerkleDistributor: Transfer failed.');
+
+        emit Claimed(index, capacity, quality, style);
+    }
 
     /// @dev function to mint new Cassettes
     /// need to change the name to `createCassette` if thats what were going with
@@ -60,7 +93,6 @@ contract Mixtape is ERC721, Ownable {
     /// alternative strategy - anyone mints, but after 1000 this function is deprecated
     function createMixtape(address owner, string memory tokenURI, uint16 s,  uint16 q, uint16 a)
         public
-        onlyOwner
         returns (uint256)
     {
         require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
@@ -76,14 +108,28 @@ contract Mixtape is ERC721, Ownable {
         return newMixtapeId;
     }
 
+    /// @dev function for changing metadata on Cassette
+    /// note: you could independently call this outside of the dapp and add as many songs
+    /// as you'd like. There is no technical constraint imposing capacity on the "back end"
+    /// it is all handled in the front end.
+    /// interesting question about what it means to own an NFT
+    /// are you buying it for the NFT (data) or ability to use experience
+    function editMixtape(uint256 mixtapeId, string memory tokenURI) public {
+      _setTokenURI(mixtapeId, tokenURI);
+    }
+
     /// @dev function for placing a bid on a cassette
-    function bidForCassette(uint index) public payable {
+    function bid(uint index) public payable {
         require(index < CASSETTE_CREATION_LIMIT);
         cassetteBids[index] = Bid(true, index, msg.sender, msg.value);
     }
 
+    // function cancelBid() public {
+    //   todo
+    // }
+
     /// @dev function for accepting a bid on a cassette
-    function acceptBidForCassette(uint index) public {
+    function acceptBid(uint index) public {
         require(ownerOf(index) == msg.sender); // <- require that caller owns token
 
         Bid storage bid = cassetteBids[index];
