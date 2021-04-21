@@ -22,9 +22,9 @@ contract Mixtape is ERC721, Ownable, IMerkleVerifier {
     // does it matter if the names of variables are long or short
     // in terms of how much gas it cost to store the contract?
     struct Mix {
-        uint16 s;  // <- capacity
-        uint16 q;   // <- quality
-        uint16 a; // <- appearance
+        uint8 capacity;
+        uint32 quality;
+        uint32 style;
     }
 
     /// @dev An array containing the Mix struct for all 1000 Mixtapes.
@@ -74,39 +74,22 @@ contract Mixtape is ERC721, Ownable, IMerkleVerifier {
         claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
     }
 
-    function claim(uint256 index, uint8 capacity, uint32 quality, uint32 style, bytes32[] calldata merkleProof) external override {
+    function claim(uint256 index, uint8 capacity, uint32 quality, uint32 style, bytes32[] calldata merkleProof, string memory tokenURI) external override {
         require(!isClaimed(index), 'Tape already claimed.');
+        require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
 
         bytes32 node = keccak256(abi.encodePacked(index, capacity, quality, style));
         require(MerkleProof.verify(merkleProof, merkleRoot, node), 'Invalid proof.');
 
         _setClaimed(index);
-        // createMixtape(msg.sender, uri, capacity, quality, style)
-        // require(IERC20(token).transfer(account, amount), 'MerkleDistributor: Transfer failed.');
+        mixes.push(Mix(capacity, quality, style));
+        _mint(msg.sender, index);
+        _setTokenURI(index, tokenURI);
+        cassettesCreatedCount++;
 
         emit Claimed(index, capacity, quality, style);
     }
 
-    /// @dev function to mint new Cassettes
-    /// need to change the name to `createCassette` if thats what were going with
-    /// required: only owner of contract can mint new tokens
-    /// alternative strategy - anyone mints, but after 1000 this function is deprecated
-    function createMixtape(address owner, string memory tokenURI, uint16 s,  uint16 q, uint16 a)
-        public
-        returns (uint256)
-    {
-        require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
-        mixes.push(Mix(s,q,a));
-
-        uint256 newMixtapeId = _tokenIds.current();
-        _mint(owner, newMixtapeId);
-        _setTokenURI(newMixtapeId, tokenURI);
-
-        cassettesCreatedCount++;
-        _tokenIds.increment();
-
-        return newMixtapeId;
-    }
 
     /// @dev function for changing metadata on Cassette
     /// note: you could independently call this outside of the dapp and add as many songs
