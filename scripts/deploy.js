@@ -17,7 +17,7 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const Mixtape = await ethers.getContractFactory("Mixtape");
-  const mixtape = await Mixtape.deploy();
+  const mixtape = await Mixtape.deploy("0xbb6a65bb478bc2b7d794c43af82603cce74c122a7aa7d6ef0e115b8b1167cefa");
   await mixtape.deployed();
 
   console.log("Token address:", mixtape.address);
