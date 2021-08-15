@@ -23,8 +23,8 @@ contract Mixtape is ERC721, Ownable, IMerkleVerifier {
     // in terms of how much gas it cost to store the contract?
     struct Mix {
         uint8 capacity;
-        uint32 quality;
-        uint32 style;
+        uint8 quality;
+        uint256 style;
     }
 
     /// @dev An array containing the Mix struct for all 1000 Mixtapes.
@@ -74,7 +74,7 @@ contract Mixtape is ERC721, Ownable, IMerkleVerifier {
         claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
     }
 
-    function claim(uint256 index, uint8 capacity, uint32 quality, uint32 style, bytes32[] calldata merkleProof, string memory tokenURI) external override {
+    function claim(uint256 index, uint8 capacity, uint8 quality, uint256 style, bytes32[] calldata merkleProof, string memory tokenURI) external override {
         require(!isClaimed(index), 'Tape already claimed.');
         require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
 

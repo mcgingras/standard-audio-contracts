@@ -29,7 +29,7 @@ class TapeTree {
 
   toNode(index, capacity, quality, style) {
     return Buffer.from(
-      utils.solidityKeccak256(['uint256', 'uint8', 'uint32', 'uint32'], [index, capacity, quality, style]).substr(2),
+      utils.solidityKeccak256(['uint256', 'uint8', 'uint8', 'uint256'], [index, capacity, quality, style]).substr(2),
       'hex'
     )
   }

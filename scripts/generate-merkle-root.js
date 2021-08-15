@@ -2,7 +2,7 @@ const { program } = require('commander');
 const fs = require('fs');
 const { parseJson } = require('../src/json-to-tree.js');
 
-// node scripts/generate-merkle-root.js --input scripts/json/tapes.json
+// node scripts/generate-merkle-root.js --input scripts/att.json
 
 program
   .version('0.0.0')

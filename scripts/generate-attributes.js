@@ -65,7 +65,7 @@ let capacityOdds = [50,40,17,3];
 // 8 colors = 2^3 = 3 bits of information
 // 17 components = 3 * 17 = 51 bits to store color -- would be nice to have 16 to make a clean uint48
 let colors = ["red", "orange", "yellow", "green", "blue", "purple", "white", "black"];
-let colorOdds = [3, 4, 20, 4, 2];
+let colorOdds = [3, 4, 20, 4, 2, 4, 5, 3];
 
 // 4 qualities = 2^2 = 2 bits of information
 let qualities = ["low", "medium", "high", "ultra"];
@@ -76,25 +76,56 @@ let colorDistribution = new Distribution(colors, colorOdds);
 let qualityDistribution = new Distribution(qualities, qualityOdds);
 
 const main = () => {
-    let attributeList = [];
-    let amountOfTapes = 50;
+    let attributeMap = {};
+    let amountOfTapes = 4;
 
     for (let i = 0; i < amountOfTapes; i++) {
-      let capacity = capacityDitribution.take().event;
-      let quality = qualityDistribution.take().event;
+      let capacityChoice = capacityDitribution.take();
+      let capacity = capacityChoice.event;
+      let capacityNum = capacityChoice.index;
+      let capacityBinary = (capacityNum >>> 0).toString(2);
+
+      let qualityChoice = qualityDistribution.take();
+      let quality = qualityChoice.event;
+      let qualityNum = qualityChoice.index;
+      let qualityBinary = (qualityNum >>> 0).toString(2);
 
       let componentMap = {}
-      let binary = "";
+      let colorBinary = "";
       for (let j = 0; j < tapeComponents.length; j++) {
         let choice = colorDistribution.take();
         componentMap[tapeComponents[j]] = choice.event;
-        binary += (choice.index >>> 0).toString(2);
+        let bin = (choice.index >>> 0).toString(2);
+        let paddedBin = String(bin).padStart(3, "0")
+        colorBinary += paddedBin;
       }
 
-      attributeList.push({"capacity": capacity, "quality": quality, "colors": componentMap, "colorBin": binary})
+      let colorNum = parseInt(colorBinary,2)
+
+      // probably not reading this as binary --
+      // probably thinks 101 is actually "101" and not 9
+      // need to fix that
+
+      attributeMap[String(i)] = {
+        "decoded": {
+          "capacity": capacity,
+          "quality": quality,
+          "colors": componentMap,
+        },
+        "raw": {
+          "style": colorNum,
+          "quality": qualityNum,
+          "capacity": capacityNum
+        },
+        "binary": {
+          "style": colorBinary,
+          "capacity": capacityBinary,
+          "quality": qualityBinary
+        }
+      }
     }
 
-    saveFrontendFiles({attributes: attributeList})
+    saveFrontendFiles(attributeMap)
 }
 
 

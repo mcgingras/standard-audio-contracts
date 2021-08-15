@@ -19,6 +19,7 @@ npx hardhat node
 ```
 new terminal tab to deploy the contract
 ```
+npx hardhat compile
 npx hardhat run scripts/deploy.js --network localhost
 ```
 new terminal tab to start spotify server

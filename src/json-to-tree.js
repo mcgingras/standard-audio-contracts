@@ -2,7 +2,7 @@ const { BigNumber, utils } = require('ethers');
 const { TapeTree } = require('./tape-tree.js')
 
 function parseJson(tapes) {
-  const tapesAsList = Object.keys(tapes).map((index) => ({...tapes[index]}))
+  const tapesAsList = Object.keys(tapes).map((index) => ({...tapes[index].raw}))
   const tree = new TapeTree(tapesAsList)
 
   const claims = tapesAsList.reduce((memo, attributes, index) => {
