@@ -1,7 +1,9 @@
 /*
 Generate Attributes
-generates attributes for all 500 cassettes.
+generates attributes for all 500 (or x amount) cassettes.
 */
+
+const AMOUNT_OF_TAPES = 4;
 
 class Distribution {
   constructor(events, odds) {
@@ -77,7 +79,7 @@ let qualityDistribution = new Distribution(qualities, qualityOdds);
 
 const main = () => {
     let attributeMap = {};
-    let amountOfTapes = 4;
+    let amountOfTapes = AMOUNT_OF_TAPES;
 
     for (let i = 0; i < amountOfTapes; i++) {
       let capacityChoice = capacityDitribution.take();
@@ -133,7 +135,7 @@ function saveFrontendFiles(attributes) {
     const fs = require("fs");
 
     fs.writeFileSync(
-        __dirname + "/att.json",
+        __dirname + "/json/att.json",
       JSON.stringify(attributes, undefined, 2)
     );
 }
