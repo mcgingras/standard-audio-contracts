@@ -1,30 +1,29 @@
 require("@nomiclabs/hardhat-waffle");
-const fs = require("fs");
-// require("hardhat-gas-reporter");
-
-// The next line is part of the sample project, you don't need it in your
-// project. It imports a Hardhat task definition, that can be used for
-// testing the frontend.
 require("./tasks/faucet");
-
+const fs = require("fs");
+const { alchemyApiKey, mnemonic } = require('./secrets.json');
 const defaultNetwork = "xdai";
 
-function mnemonic() {
-  try {
-    return fs.readFileSync("./mnemonic.txt").toString().trim();
-  } catch (e) {
-    if (defaultNetwork !== "localhost") {
-      console.log("☢️ WARNING: No mnemonic file created for a deploy account. Try `yarn run generate` and then `yarn run account`.")
-    }
-  }
-  return "";
-}
+// function mnemonic() {
+//   try {
+//     return fs.readFileSync("./mnemonic.txt").toString().trim();
+//   } catch (e) {
+//     if (defaultNetwork !== "localhost") {
+//       console.log("☢️ WARNING: No mnemonic file created for a deploy account. Try `yarn run generate` and then `yarn run account`.")
+//     }
+//   }
+//   return "";
+// }
 
 module.exports = {
   solidity: "0.7.3",
   networks: {
     hardhat: {
       chainId: 1337
+    },
+    rinkeby: {
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${alchemyApiKey}`,
+      accounts: { mnemonic: mnemonic },
     },
     xdai: {
       url: "https://rpc.xdaichain.com/",

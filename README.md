@@ -35,7 +35,3 @@ cd frontend
 npm install
 npm start
 ```
-
-oh also you probably need all my API keys so text me about that -mg
-
-dont make them casettes make it radio stations
