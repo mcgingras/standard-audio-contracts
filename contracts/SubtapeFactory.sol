@@ -7,17 +7,10 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
-abstract contract SubtapeFactory is
-    ERC721Upgradeable,
-    IERC2981Upgradeable,
-    OwnableUpgradeable
-{
+contract SubtapeFactory is ERC721Upgradeable, OwnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     CountersUpgradeable.Counter private mintedCount;
-
-    // what happens if we have an empty constructor?
-    constructor() {}
 
     function initialize(
         address _owner,
@@ -28,5 +21,9 @@ abstract contract SubtapeFactory is
         __Ownable_init();
         transferOwnership(_owner);
         mintedCount.increment();
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return mintedCount.current() - 1;
     }
 }

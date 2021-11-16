@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+// IDK IF WE REALLY NEED IT TO BE ENUMERABLE
+// ITS HELPFUL FOR TEST (???) BUT MAYBE USES MORE GAS SO NOT WORTH
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./IMerkleVerifier.sol";

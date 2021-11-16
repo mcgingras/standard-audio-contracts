@@ -74,6 +74,9 @@ describe("Mixtape contract", function () {
         )
       ).to.emit(mixtapeContract, "Claimed");
 
+      const a = await mixtapeContract.tokenByIndex(0);
+      console.log(a);
+
       const mixtapeURI = mixtapeContract.tokenURI(
         await mixtapeContract.tokenByIndex(0)
       );
