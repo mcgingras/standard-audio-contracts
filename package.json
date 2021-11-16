@@ -6,7 +6,9 @@
         "test": "test"
     },
     "scripts": {
-        "test": "hardhat test"
+        "test": "hardhat test",
+        "typechain": "hardhat typechain",
+        "compile": "hardhat compile"
     },
     "keywords": [
         "hardhat",
@@ -23,6 +25,7 @@
     "devDependencies": {
         "@nomiclabs/hardhat-ethers": "^2.0.2",
         "@nomiclabs/hardhat-waffle": "^2.0.1",
+        "@types/mocha": "^9.0.0",
         "chai": "^4.3.4",
         "ethereum-waffle": "^3.4.0",
         "ethers": "^5.5.1",
@@ -31,17 +34,26 @@
         "husky": "^7.0.4"
     },
     "dependencies": {
+        "@nomiclabs/hardhat-etherscan": "^2.1.7",
         "@openzeppelin/contracts": "^4.3.3",
         "@openzeppelin/contracts-upgradeable": "^4.3.3",
         "@typechain/ethers-v5": "^8.0.2",
         "@typechain/hardhat": "^3.0.0",
+        "@types/chai": "^4.2.22",
+        "@types/node": "^16.11.7",
         "axios": "^0.24.0",
+        "chai-ethers": "^0.0.1",
         "commander": "^8.3.0",
         "dotenv": "^10.0.0",
         "express": "^4.17.1",
         "faker": "^5.5.3",
+        "hardhat-deploy": "^0.9.8",
+        "hardhat-deploy-ethers": "*",
+        "mocha": "^7.2.0",
         "querystring": "^0.2.0",
         "request": "^2.88.2",
-        "typechain": "^6.0.2"
+        "ts-node": "^8.10.2",
+        "typechain": "^6.0.2",
+        "typescript": "^4.4.4"
     }
 }
