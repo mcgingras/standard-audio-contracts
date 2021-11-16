@@ -8,5 +8,5 @@ artifacts
 .env
 spotify_api/.env
 secrets.json
-
+typechain-types
 mnemonic.txt

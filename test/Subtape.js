@@ -33,4 +33,21 @@ describe("Subtape factory contract", function () {
       // expect((await mixtapeContract.symbol()) === "TAPE");
     });
   });
+
+  describe("Factory creator works...", function () {
+    it("Creates a factory", async function () {
+      subtapeContract = await Subtape.deploy();
+      await subtapeContract.deployed();
+      subtapeContractAddr = subtapeContract.address;
+
+      subtapeCreatorContract = await SubtapeCreator.deploy(subtapeContractAddr);
+      await subtapeCreatorContract.deployed();
+      subtapeCreatorContractAddr = subtapeCreatorContract.address;
+
+      await subtapeCreatorContract.createSubtapeFactory("TEST", "T");
+
+      const factory = await subtapeCreatorContract.getFactoryAtId(0);
+      console.log(factory);
+    });
+  });
 });

@@ -1,3 +1,5 @@
+require("@typechain/hardhat");
+require("@nomiclabs/hardhat-ethers");
 require("@nomiclabs/hardhat-waffle");
 require("./tasks/faucet");
 const fs = require("fs");

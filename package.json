@@ -12,7 +12,11 @@
         "hardhat",
         "ethereum",
         "NFT",
-        "music"
+        "music",
+        "typescript",
+        "ethers",
+        "ethereum",
+        "web3"
     ],
     "author": "Michael Gingras",
     "license": "MIT",
@@ -29,12 +33,15 @@
     "dependencies": {
         "@openzeppelin/contracts": "^4.3.3",
         "@openzeppelin/contracts-upgradeable": "^4.3.3",
+        "@typechain/ethers-v5": "^8.0.2",
+        "@typechain/hardhat": "^3.0.0",
         "axios": "^0.24.0",
         "commander": "^8.3.0",
         "dotenv": "^10.0.0",
         "express": "^4.17.1",
         "faker": "^5.5.3",
         "querystring": "^0.2.0",
-        "request": "^2.88.2"
+        "request": "^2.88.2",
+        "typechain": "^6.0.2"
     }
 }
