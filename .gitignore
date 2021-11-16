@@ -8,3 +8,5 @@ artifacts
 .env
 spotify_api/.env
 secrets.json
+
+mnemonic.txt

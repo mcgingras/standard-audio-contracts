@@ -1,5 +1,5 @@
 {
-    "name": "NFT-Mixtapes",
+    "name": "MXTapes",
     "version": "1.0.0",
     "description": "Create NFTs for your mixtapes.",
     "directories": {
@@ -17,22 +17,23 @@
     "author": "Michael Gingras",
     "license": "MIT",
     "devDependencies": {
-        "@nomiclabs/hardhat-ethers": "^2.0.0",
-        "@nomiclabs/hardhat-waffle": "^2.0.0",
-        "chai": "^4.2.0",
-        "ethereum-waffle": "^3.1.1",
-        "ethers": "^5.0.0",
-        "hardhat": "^2.4.3",
+        "@nomiclabs/hardhat-ethers": "^2.0.2",
+        "@nomiclabs/hardhat-waffle": "^2.0.1",
+        "chai": "^4.3.4",
+        "ethereum-waffle": "^3.4.0",
+        "ethers": "^5.5.1",
+        "hardhat": "^2.6.8",
         "hardhat-gas-reporter": "^1.0.4",
-        "husky": "^4.2.5"
+        "husky": "^7.0.4"
     },
     "dependencies": {
-        "@openzeppelin/contracts": "^3.4.0",
-        "axios": "^0.21.1",
-        "commander": "^8.0.0",
-        "dotenv": "^8.2.0",
+        "@openzeppelin/contracts": "^4.3.3",
+        "@openzeppelin/contracts-upgradeable": "^4.3.3",
+        "axios": "^0.24.0",
+        "commander": "^8.3.0",
+        "dotenv": "^10.0.0",
         "express": "^4.17.1",
-        "faker": "^5.4.0",
+        "faker": "^5.5.3",
         "querystring": "^0.2.0",
         "request": "^2.88.2"
     }

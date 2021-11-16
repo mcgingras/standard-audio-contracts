@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.7.3;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./IMerkleVerifier.sol";
 
-contract Mixtape is ERC721, Ownable, IMerkleVerifier {
+contract Mixtape is ERC721Enumerable, Ownable, IMerkleVerifier {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -15,6 +15,7 @@ contract Mixtape is ERC721, Ownable, IMerkleVerifier {
     uint256 public cassettesCreatedCount;
     bytes32 public immutable override merkleRoot;
     mapping(uint256 => uint256) private claimedBitMap;
+    mapping(uint256 => string) private _tokenURIs;
 
     bool public allCassettesClaimed = false;
 
@@ -79,12 +80,25 @@ contract Mixtape is ERC721, Ownable, IMerkleVerifier {
     }
 
     /// @dev function for changing metadata on Cassette
-    /// note: you could independently call this outside of the dapp and add as many songs
-    /// as you'd like. There is no technical constraint imposing capacity on the "back end"
-    /// it is all handled in the front end.
-    /// interesting question about what it means to own an NFT
+    /// note: you could independently call this outside
+    /// of the dapp and add as many songs as you'd like.
+    /// There is no technical constraint imposing capacity
+    /// within this solidity contract, its all front-end.
+    /// -------------------------------------------------
+    /// interesting question about what it means to own an NFT?
     /// are you buying it for the NFT (data) or ability to use experience
     function editMixtape(uint256 mixtapeId, string memory tokenURI) public {
         _setTokenURI(mixtapeId, tokenURI);
+    }
+
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
+        internal
+        virtual
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI set of nonexistent token"
+        );
+        _tokenURIs[tokenId] = _tokenURI;
     }
 }
