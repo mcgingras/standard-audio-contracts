@@ -7,6 +7,12 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
+/**
+    This is a smart contract for handling "burned" mxtapes.
+    @dev This allows you to create "burned" (copied) tapes of an original tape.
+    @author michael gingras
+    Repository: https://github.com/mcgingras/nftapes
+*/
 contract SubtapeFactory is ERC721Upgradeable, OwnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
@@ -25,5 +31,38 @@ contract SubtapeFactory is ERC721Upgradeable, OwnableUpgradeable {
 
     function totalSupply() public view returns (uint256) {
         return mintedCount.current() - 1;
+    }
+
+    function mintSubtape(address to) external onlyOwner returns (uint256) {
+        address[] memory toMint = new address[](1);
+        toMint[0] = to;
+        return _mintSubTapes(toMint);
+    }
+
+    function mintSubtapes(address[] memory recipients)
+        external
+        onlyOwner
+        returns (uint256)
+    {
+        // require(isOwner);
+        return _mintSubTapes(recipients);
+    }
+
+    /// just sanity check its not neccessary to have
+    /// only owner on here too, right?
+    function _mintSubTapes(address[] memory recipients)
+        internal
+        returns (uint256)
+    {
+        uint256 startAt = mintedCount.current();
+        uint256 endAt = startAt + recipients.length - 1;
+        while (mintedCount.current() <= endAt) {
+            _mint(
+                recipients[mintedCount.current() - startAt],
+                mintedCount.current()
+            );
+            mintedCount.increment();
+        }
+        return mintedCount.current();
     }
 }

@@ -1,5 +1,4 @@
 const { expect } = require("chai");
-const { BigNumber } = require("ethers");
 import "@nomiclabs/hardhat-ethers";
 import { ethers, deployments } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
