@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.6;
 
-import {ClonesUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
-import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
+import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 
 // the contract that this factory clones
 import "./SubtapeFactory.sol";
 
 contract SubtapeFactoryCreator {
-    using CountersUpgradeable for CountersUpgradeable.Counter;
+    using Counters for Counters.Counter;
 
     /// Counter for current contract id upgraded
-    CountersUpgradeable.Counter private contractCount;
+    Counters.Counter private contractCount;
 
     // the address of the contract we want to clone
     address public implementation;
@@ -26,7 +26,7 @@ contract SubtapeFactoryCreator {
         returns (uint256)
     {
         uint256 newId = contractCount.current();
-        address newContract = ClonesUpgradeable.cloneDeterministic(
+        address newContract = Clones.cloneDeterministic(
             implementation,
             bytes32(abi.encodePacked(newId))
         );
@@ -45,7 +45,7 @@ contract SubtapeFactoryCreator {
     {
         return
             SubtapeFactory(
-                ClonesUpgradeable.predictDeterministicAddress(
+                Clones.predictDeterministicAddress(
                     implementation,
                     bytes32(abi.encodePacked(factoryId)),
                     address(this)
