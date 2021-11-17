@@ -61,4 +61,67 @@ describe("Subtape factory contract", function () {
       expect(await subtapeFactoryContract.owner()).to.be.equal(signerAddress);
     });
   });
+
+  describe("Minting functions", () => {
+    it("mints a subtape to self", async () => {});
+
+    it("mints a subtape to a new address", async () => {
+      let addr2Signer: SignerWithAddress;
+      let addr2: string;
+
+      addr2Signer = (await ethers.getSigners())[1];
+      addr2 = await addr2Signer.getAddress();
+
+      // minting a new subtape to addr2
+      await subtapeFactoryContract.mintSubtape(addr2);
+
+      expect(await subtapeFactoryContract.ownerOf(0)).to.be.equal(addr2);
+    });
+
+    // wondering what the gas implications are of minting
+    // many tapes at once? How to compare gas...
+    it("mints many tapes at once", async () => {
+      const signers: SignerWithAddress[] = await ethers.getSigners();
+      const first_three_signers: SignerWithAddress[] = signers.splice(1, 3);
+      const first_three_addresses: string[] = first_three_signers.map(
+        (signer) => signer.address
+      );
+
+      await subtapeFactoryContract.mintSubtapes(first_three_addresses);
+      expect(await subtapeFactoryContract.ownerOf(0)).to.be.equal(
+        first_three_addresses[0]
+      );
+      expect(await subtapeFactoryContract.ownerOf(1)).to.be.equal(
+        first_three_addresses[1]
+      );
+      expect(await subtapeFactoryContract.ownerOf(2)).to.be.equal(
+        first_three_addresses[2]
+      );
+    });
+  });
+
+  describe("Checking supply", () => {
+    // const to toggle amount of tapes if need be...
+    const NUM_TAPES = 3;
+
+    // We want to seed the contract with a few subtapes for each test case
+    // so we can test functions that rely on the existance of tapes
+    beforeEach(async () => {
+      const signers: SignerWithAddress[] = await ethers.getSigners();
+      const first_n_signers: SignerWithAddress[] = signers.splice(1, NUM_TAPES);
+      const first_n_addresses: string[] = first_n_signers.map(
+        (signer) => signer.address
+      );
+
+      await subtapeFactoryContract.mintSubtapes(first_n_addresses);
+    });
+
+    it("returns the amount of tapes in circulation", async () => {
+      expect(await subtapeFactoryContract.totalSupply()).to.be.equal(NUM_TAPES);
+    });
+
+    it("gets all of the subtapes of a given address", async () => {
+      // not sure you can do this without enumerating, but it would be cool and helpful.
+    });
+  });
 });

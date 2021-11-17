@@ -1,7 +1,8 @@
 const { expect } = require("chai");
 const { TapeTree } = require("../src/tape-tree.js");
-const { BigNumber } = require("ethers");
-
+import { BigNumber, ContractFactory, Contract } from "ethers";
+import { ethers } from "hardhat";
+import { Mixtape } from "../typechain-types";
 /*
  Edge cases that still need testing --
  - If you mint a token, should not be able to mint a new token
@@ -12,14 +13,16 @@ const ZERO_BYTES32 =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 describe("Mixtape contract", function () {
-  let Mixtape;
-  let mixtapeContract;
+  let Mixtape: ContractFactory;
+  let mixtapeContract: Contract;
   let owner;
   let addr1;
   let addr2;
   let addrs;
   let contractAddr;
-  let tree;
+  let tree: any;
+
+  const BASE_URI = "https://pinata.cloud";
 
   beforeEach(async function () {
     Mixtape = await ethers.getContractFactory("Mixtape");
@@ -28,11 +31,15 @@ describe("Mixtape contract", function () {
 
   describe("Sanity check...", function () {
     it("should set the correct token symbol", async function () {
-      mixtapeContract = await Mixtape.deploy(ZERO_BYTES32);
+      mixtapeContract = await Mixtape.deploy(ZERO_BYTES32, BASE_URI);
       await mixtapeContract.deployed();
 
       contractAddr = mixtapeContract.address;
       expect((await mixtapeContract.symbol()) === "TAPE");
+    });
+
+    it("should overwrite the baseURI from the OZ contract", async () => {
+      expect(await mixtapeContract.baseURI()).to.be.equal(BASE_URI);
     });
   });
 
@@ -51,7 +58,7 @@ describe("Mixtape contract", function () {
         },
       ]);
 
-      mixtapeContract = await Mixtape.deploy(tree.getHexRoot());
+      mixtapeContract = await Mixtape.deploy(tree.getHexRoot(), BASE_URI);
       await mixtapeContract.deployed();
     });
 
@@ -74,10 +81,7 @@ describe("Mixtape contract", function () {
         )
       ).to.emit(mixtapeContract, "Claimed");
 
-      const a = await mixtapeContract.tokenByIndex(0);
-      const mixtapeURI = mixtapeContract.tokenURI(
-        await mixtapeContract.tokenByIndex(0)
-      );
+      const mixtapeURI = mixtapeContract.tokenURI(0);
       expect(mixtapeURI === _testURI);
 
       // I hardcoded values for the struct... need to change this
@@ -95,10 +99,8 @@ describe("Mixtape contract", function () {
     it("Should allow editing of NFT", async function () {
       const _newURI = "updated metadata";
 
-      const tx = await mixtapeContract.editMixtape(0, _newURI);
-      const mixtapeURI = mixtapeContract.tokenURI(
-        await mixtapeContract.tokenByIndex(0)
-      );
+      await mixtapeContract.editMixtape(0, _newURI);
+      const mixtapeURI = mixtapeContract.tokenURI(0);
       expect(mixtapeURI === _newURI);
     });
   });

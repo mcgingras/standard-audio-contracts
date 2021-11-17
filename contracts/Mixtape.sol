@@ -6,18 +6,21 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 // IDK IF WE REALLY NEED IT TO BE ENUMERABLE
 // ITS HELPFUL FOR TEST (???) BUT MAYBE USES MORE GAS SO NOT WORTH
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+// needed for custom URIs
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "./IMerkleVerifier.sol";
+import "./SubtapeFactoryCreator.sol";
 
-contract Mixtape is ERC721Enumerable, Ownable, IMerkleVerifier {
+contract Mixtape is ERC721URIStorage, Ownable, IMerkleVerifier {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
+    string public baseURI;
     uint256 public constant CASSETTE_CREATION_LIMIT = 1000;
     uint256 public cassettesCreatedCount;
     bytes32 public immutable override merkleRoot;
     mapping(uint256 => uint256) private claimedBitMap;
-    mapping(uint256 => string) private _tokenURIs;
 
     bool public allCassettesClaimed = false;
 
@@ -33,8 +36,11 @@ contract Mixtape is ERC721Enumerable, Ownable, IMerkleVerifier {
     Mix[] public mixes;
 
     // probably want an event for when a new token is minted?
-    constructor(bytes32 merkleRoot_) public ERC721("NFTapes", "TAPE") {
+    constructor(bytes32 merkleRoot_, string memory baseURI_)
+        ERC721("NFTapes", "TAPE")
+    {
         merkleRoot = merkleRoot_;
+        baseURI = baseURI_;
     }
 
     function isClaimed(uint256 index) public view override returns (bool) {
@@ -93,14 +99,7 @@ contract Mixtape is ERC721Enumerable, Ownable, IMerkleVerifier {
         _setTokenURI(mixtapeId, tokenURI);
     }
 
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
-        internal
-        virtual
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI set of nonexistent token"
-        );
-        _tokenURIs[tokenId] = _tokenURI;
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 }

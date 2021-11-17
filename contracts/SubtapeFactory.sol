@@ -26,11 +26,10 @@ contract SubtapeFactory is ERC721Upgradeable, OwnableUpgradeable {
         __ERC721_init(_name, _symbol);
         __Ownable_init();
         transferOwnership(_owner);
-        mintedCount.increment();
     }
 
     function totalSupply() public view returns (uint256) {
-        return mintedCount.current() - 1;
+        return mintedCount.current();
     }
 
     function mintSubtape(address to) external onlyOwner returns (uint256) {
