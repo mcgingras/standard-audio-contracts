@@ -7,7 +7,7 @@ import { Mixtape, SubtapeFactory } from "../typechain-types";
 /*
  * Tests for the MXTape contract
  */
-describe("Subtape factory contract", function () {
+describe("MIXTAPE CONTRACT", function () {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let mixtape: Mixtape;

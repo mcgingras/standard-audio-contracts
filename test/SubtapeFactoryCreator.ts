@@ -11,7 +11,7 @@ import { SubtapeFactoryCreator, SubtapeFactory } from "../typechain-types";
  * Could you technically mint ERC721s from that contract?
  * Or is it just a base contract...
  */
-describe("Subtape factory contract", function () {
+describe("SUBTAPE FACTORY CREATOR CONTRACT", function () {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let subtapeFactoryCreator: SubtapeFactoryCreator;
@@ -35,7 +35,6 @@ describe("Subtape factory contract", function () {
 
   describe("Sanity check...", () => {
     it("creates a new factory and initializes correctly", async () => {
-      subtapeFactoryCreator.getFactoryAtId;
       await subtapeFactoryCreator.createSubtapeFactory("TEST FACTORY", "TF");
       const subtapeFactory0 = await subtapeFactoryCreator.getFactoryAtId(0);
 

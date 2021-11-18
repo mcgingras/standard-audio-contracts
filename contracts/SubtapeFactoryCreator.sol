@@ -7,7 +7,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 // the contract that this factory clones
 import "./SubtapeFactory.sol";
 
-abstract contract SubtapeFactoryCreator {
+contract SubtapeFactoryCreator {
     using Counters for Counters.Counter;
 
     /// Counter for current contract id upgraded
