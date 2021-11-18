@@ -4,6 +4,13 @@ import { ethers, deployments } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { SubtapeFactoryCreator, SubtapeFactory } from "../typechain-types";
 
+/*
+ * Tests for the subtape factory creator.
+ * I'm a little bit confused about the deploy steps in production.
+ * Does the "template" ERC721 get used at all?
+ * Could you technically mint ERC721s from that contract?
+ * Or is it just a base contract...
+ */
 describe("Subtape factory contract", function () {
   let signer: SignerWithAddress;
   let signerAddress: string;
@@ -17,9 +24,6 @@ describe("Subtape factory contract", function () {
       "SubtapeFactoryCreator",
     ]);
 
-    const subtapeFactoryAddress = (await deployments.get("SubtapeFactory"))
-      .address;
-
     subtapeFactoryCreator = (await ethers.getContractAt(
       "SubtapeFactoryCreator",
       SubtapeFactoryCreator.address
@@ -30,7 +34,8 @@ describe("Subtape factory contract", function () {
   });
 
   describe("Sanity check...", () => {
-    it("creates a new factory", async () => {
+    it("creates a new factory and initializes correctly", async () => {
+      subtapeFactoryCreator.getFactoryAtId;
       await subtapeFactoryCreator.createSubtapeFactory("TEST FACTORY", "TF");
       const subtapeFactory0 = await subtapeFactoryCreator.getFactoryAtId(0);
 
@@ -41,6 +46,19 @@ describe("Subtape factory contract", function () {
 
       expect(await subtapeContract.name()).to.be.equal("TEST FACTORY");
       expect(await subtapeContract.symbol()).to.be.equal("TF");
+    });
+
+    it("is able to mint subtapes from newly created factory", async () => {
+      await subtapeFactoryCreator.createSubtapeFactory("TEST FACTORY", "TF");
+      const subtapeFactory0 = await subtapeFactoryCreator.getFactoryAtId(0);
+
+      const subtapeContract = (await ethers.getContractAt(
+        "SubtapeFactory",
+        subtapeFactory0
+      )) as SubtapeFactory;
+
+      await subtapeContract.mintSubtape(signerAddress);
+      expect(await subtapeContract.ownerOf(0)).to.be.equal(signerAddress);
     });
 
     /*
@@ -61,3 +79,9 @@ describe("Subtape factory contract", function () {
     });
   });
 });
+
+// tips
+// expect(
+//   await minterContract
+//     .connect(s2)
+//     .purchase({ value: ethers.utils.parseEther("0.2") })

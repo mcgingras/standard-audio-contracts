@@ -30,3 +30,9 @@ new terminal tab to deploy the contract
 npx hardhat compile
 npx hardhat run scripts/deploy.js --network localhost
 ```
+
+### Things that I keep forgetting
+
+When you call `_mint` you pass the tokenId, so as long as tokenId and the index within the array are the same, there really isn't any problem or need for functions in enumerable like `getIdAtIndex`...
+
+we should be fine.

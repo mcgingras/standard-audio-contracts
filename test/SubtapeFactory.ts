@@ -72,9 +72,6 @@ describe("Subtape factory contract", function () {
       addr2Signer = (await ethers.getSigners())[1];
       addr2 = await addr2Signer.getAddress();
 
-      // minting a new subtape to addr2
-      await subtapeFactoryContract.mintSubtape(addr2);
-
       expect(await subtapeFactoryContract.ownerOf(0)).to.be.equal(addr2);
     });
 
