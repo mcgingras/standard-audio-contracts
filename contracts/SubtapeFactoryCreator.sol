@@ -20,9 +20,18 @@ contract SubtapeFactoryCreator {
         implementation = _implementation;
     }
 
-    // Create a new factory
+    /**
+     * Creates a subtape factory.
+     * @dev note:I want this function to be callable from the inheriting contract. I am not super great at
+     * solidity yet, so I'm not totally sure what these access modifiers do. I had it set as external
+     * but I was not able to call it from the inheriting function when it was external. Public was the
+     * only way I could call it from the inheriting function AND test the functionality of this contract
+     * on its own (sort of like unit testing the contract vs integration testing the main contract)
+     * Anyways, I'm not sure if thats the right way to go about it, so if these contracts get audited that is
+     * something I would want to check so I'm making a point of it here.
+     */
     function createSubtapeFactory(string memory _name, string memory _symbol)
-        external
+        public
         returns (uint256)
     {
         uint256 newId = contractCount.current();

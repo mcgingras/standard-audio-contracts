@@ -13,7 +13,11 @@ import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Addr
     @author michael gingras
     Repository: https://github.com/mcgingras/nftapes
 */
-contract SubtapeFactory is ERC721Upgradeable, OwnableUpgradeable {
+contract SubtapeFactory is
+    ERC721Upgradeable,
+    IERC2981Upgradeable,
+    OwnableUpgradeable
+{
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     CountersUpgradeable.Counter private mintedCount;
@@ -63,5 +67,39 @@ contract SubtapeFactory is ERC721Upgradeable, OwnableUpgradeable {
             mintedCount.increment();
         }
         return mintedCount.current();
+    }
+
+    /// @notice returns how much and to whom royalty info should be paid out to
+    /// @dev The owner of this contract should always be the owner of the parent mixtape
+    /// need to make sure that transfers as well. (todo: write some test for that)
+    /// @param ...
+    /// @return receiver: address to send royalties // amount: how much to send
+    function royaltyInfo(uint256, uint256 _salePrice)
+        external
+        view
+        override
+        returns (address receiver, uint256 royaltyAmount)
+    {
+        if (owner() == address(0x0)) {
+            return (owner(), 0);
+        }
+
+        // TODO: override royalty from .05 to whatever
+        return (owner(), (_salePrice * .05) / 10_000);
+    }
+
+    /// @notice I'm assuming this is so any dapps that consume this contract can tell what sort of interfaces it supports.
+    /// @dev pulling this direct from OpenZepplin
+    /// @param interfaceId the interfaceId
+    /// @return boolean if the interface is supported or not
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721Upgradeable, IERC165Upgradeable)
+        returns (bool)
+    {
+        return
+            type(IERC2981Upgradeable).interfaceId == interfaceId ||
+            ERC721Upgradeable.supportsInterface(interfaceId);
     }
 }

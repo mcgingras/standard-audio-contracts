@@ -3,25 +3,33 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-// IDK IF WE REALLY NEED IT TO BE ENUMERABLE
-// ITS HELPFUL FOR TEST (???) BUT MAYBE USES MORE GAS SO NOT WORTH
+
+// need this is we want to enumerate all tokens
+// combine tokenOfOwnerByIndex with balanceOf
+// not sure if we want that yet though
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+
 // needed for custom URIs
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IMerkleVerifier.sol";
 import "./SubtapeFactoryCreator.sol";
 
-contract Mixtape is ERC721URIStorage, Ownable, IMerkleVerifier {
+contract Mixtape is
+    ERC721URIStorage,
+    Ownable,
+    IMerkleVerifier,
+    SubtapeFactoryCreator
+{
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
     string public baseURI;
-    uint256 public constant CASSETTE_CREATION_LIMIT = 1000;
     uint256 public cassettesCreatedCount;
+    uint256 public constant CASSETTE_CREATION_LIMIT = 1000;
     bytes32 public immutable override merkleRoot;
     mapping(uint256 => uint256) private claimedBitMap;
-
     bool public allCassettesClaimed = false;
 
     // does it matter if the names of variables are long or short
@@ -36,9 +44,11 @@ contract Mixtape is ERC721URIStorage, Ownable, IMerkleVerifier {
     Mix[] public mixes;
 
     // probably want an event for when a new token is minted?
-    constructor(bytes32 merkleRoot_, string memory baseURI_)
-        ERC721("NFTapes", "TAPE")
-    {
+    constructor(
+        bytes32 merkleRoot_,
+        string memory baseURI_,
+        address _implementation
+    ) ERC721("NFTapes", "TAPE") SubtapeFactoryCreator(_implementation) {
         merkleRoot = merkleRoot_;
         baseURI = baseURI_;
     }
@@ -66,9 +76,13 @@ contract Mixtape is ERC721URIStorage, Ownable, IMerkleVerifier {
         uint256 style,
         bytes32[] calldata merkleProof,
         string memory tokenURI
-    ) external override {
+    ) external payable override {
         require(!isClaimed(index), "Tape already claimed.");
-        require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
+        require(
+            cassettesCreatedCount < CASSETTE_CREATION_LIMIT,
+            "All cassettes have been minted"
+        );
+        require(msg.value >= 0.1 ether, "Not enough ETH sent: check price.");
 
         bytes32 node = keccak256(
             abi.encodePacked(index, capacity, quality, style)
@@ -83,6 +97,11 @@ contract Mixtape is ERC721URIStorage, Ownable, IMerkleVerifier {
         _mint(msg.sender, index);
         _setTokenURI(index, tokenURI);
         cassettesCreatedCount++;
+
+        // I don't know if this is going to work, I'm a bit confused about how
+
+        // contracts inherit from each other or what we are doing here...
+        createSubtapeFactory("demo", "d");
 
         emit Claimed(index, capacity, quality, style);
     }
@@ -99,7 +118,20 @@ contract Mixtape is ERC721URIStorage, Ownable, IMerkleVerifier {
         _setTokenURI(mixtapeId, tokenURI);
     }
 
+    /// This is an override over the default OpenZepplin ERC721 contract
+    /// that sets an empty string for the baseURI. I'm not yet sure if I
+    /// actually want to use the baseURI at all, I'm not sure if it
+    /// actually saves us any gas or anything. We could save the baseURI
+    /// and hardcode it into our dapp, but others might need it, so it
+    /// might help with interoperability and end up being a requirement.
+    /// Either way, I'm going to leave it in here.
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
+    }
+
+    /// todo: need to look into reentrency hacks?
+    /// the OZ docs were warning about that
+    function withdraw() external onlyOwner {
+        Address.sendValue(payable(owner()), address(this).balance);
     }
 }
