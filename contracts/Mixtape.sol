@@ -78,7 +78,11 @@ contract Mixtape is
         string memory tokenURI
     ) external payable override {
         require(!isClaimed(index), "Tape already claimed.");
-        require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
+        require(
+            cassettesCreatedCount < CASSETTE_CREATION_LIMIT,
+            "All cassettes have been minted"
+        );
+        require(msg.value >= 0.1 ether, "Not enough ETH sent: check price.");
 
         bytes32 node = keccak256(
             abi.encodePacked(index, capacity, quality, style)

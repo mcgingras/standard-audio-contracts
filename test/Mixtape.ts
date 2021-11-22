@@ -67,7 +67,8 @@ describe("MIXTAPE CONTRACT", function () {
           BigNumber.from(10),
           BigNumber.from(10),
           proof0,
-          DEMO_URI
+          DEMO_URI,
+          { value: ethers.utils.parseEther("0.1") }
         )
       ).to.emit(mixtape, "Claimed");
     });
@@ -103,7 +104,8 @@ describe("MIXTAPE CONTRACT", function () {
         BigNumber.from(10),
         BigNumber.from(10),
         proof0,
-        DEMO_URI
+        DEMO_URI,
+        { value: ethers.utils.parseEther("0.1") }
       );
     });
 
@@ -147,6 +149,17 @@ describe("MIXTAPE CONTRACT", function () {
       await expect(subtapeContract.owner()).to.be.revertedWith(
         "call revert exception"
       );
+    });
+
+    it("Withdraws from contract successfully", async () => {
+      const signerBalanceBeforeWithdraw = await signer.getBalance();
+      await mixtape.withdraw();
+      // Some ETH is lost from withdraw contract interaction.
+      expect(
+        (await signer.getBalance())
+          .sub(signerBalanceBeforeWithdraw)
+          .gte(ethers.utils.parseEther("0.09"))
+      ).to.be.true;
     });
   });
 });
