@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 // needed for custom URIs
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./IMerkleVerifier.sol";
 import "./SubtapeFactoryCreator.sol";
 
@@ -75,7 +76,7 @@ contract Mixtape is
         uint256 style,
         bytes32[] calldata merkleProof,
         string memory tokenURI
-    ) external override {
+    ) external payable override {
         require(!isClaimed(index), "Tape already claimed.");
         require(cassettesCreatedCount < CASSETTE_CREATION_LIMIT);
 
@@ -94,8 +95,10 @@ contract Mixtape is
         cassettesCreatedCount++;
 
         // I don't know if this is going to work, I'm a bit confused about how
+
         // contracts inherit from each other or what we are doing here...
-        // SubtapeFactoryCreator.createSubtapeFactory("demo", "d");
+        createSubtapeFactory("demo", "d");
+
         emit Claimed(index, capacity, quality, style);
     }
 
@@ -120,5 +123,11 @@ contract Mixtape is
     /// Either way, I'm going to leave it in here.
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
+    }
+
+    /// todo: need to look into reentrency hacks?
+    /// the OZ docs were warning about that
+    function withdraw() external onlyOwner {
+        Address.sendValue(payable(owner()), address(this).balance);
     }
 }

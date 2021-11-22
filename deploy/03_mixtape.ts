@@ -1,5 +1,21 @@
-const ZERO_BYTES32 =
-  "0x0000000000000000000000000000000000000000000000000000000000000000";
+const { TapeTree } = require("../src/tape-tree.js");
+import { BigNumber } from "ethers";
+
+// Demo tree --
+// we will need to use a real tree for the actual deployment...
+const tree = new TapeTree([
+  {
+    capacity: BigNumber.from(10),
+    quality: BigNumber.from(10),
+    style: BigNumber.from(10),
+  },
+  {
+    capacity: BigNumber.from(10),
+    quality: BigNumber.from(10),
+    style: BigNumber.from(10),
+  },
+]);
+
 const BASE_URI = "https://pinata.cloud";
 
 module.exports = async ({ getNamedAccounts, deployments }: any) => {
@@ -10,7 +26,7 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
 
   await deploy("Mixtape", {
     from: deployer,
-    args: [ZERO_BYTES32, BASE_URI, SubtapeFactory],
+    args: [tree.getHexRoot(), BASE_URI, SubtapeFactory],
     log: true,
   });
 };
