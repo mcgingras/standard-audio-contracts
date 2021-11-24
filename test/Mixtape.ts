@@ -13,6 +13,8 @@ describe("MIXTAPE CONTRACT", function () {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let mixtape: Mixtape;
+  let altSigner: SignerWithAddress;
+  let altSignerAddress: string;
 
   beforeEach(async function () {
     const { Mixtape } = await deployments.fixture([
@@ -160,6 +162,56 @@ describe("MIXTAPE CONTRACT", function () {
           .sub(signerBalanceBeforeWithdraw)
           .gte(ethers.utils.parseEther("0.09"))
       ).to.be.true;
+    });
+  });
+
+  describe("alternate address interaction", async () => {
+    beforeEach(async () => {
+      const tree = new TapeTree([
+        {
+          capacity: BigNumber.from(10),
+          quality: BigNumber.from(10),
+          style: BigNumber.from(10),
+        },
+        {
+          capacity: BigNumber.from(10),
+          quality: BigNumber.from(10),
+          style: BigNumber.from(10),
+        },
+      ]);
+
+      const DEMO_URI = "test of some metadata";
+      const proof0 = tree.getProof(
+        0,
+        BigNumber.from(10),
+        BigNumber.from(10),
+        BigNumber.from(10)
+      );
+
+      altSigner = (await ethers.getSigners())[1];
+      altSignerAddress = await altSigner.getAddress();
+      const m = await mixtape
+        .connect(altSigner)
+        .claim(
+          0,
+          BigNumber.from(10),
+          BigNumber.from(10),
+          BigNumber.from(10),
+          proof0,
+          DEMO_URI,
+          { value: ethers.utils.parseEther("0.1") }
+        );
+    });
+
+    it("is able to purchase mixtape from alternate address", async () => {
+      expect(await mixtape.ownerOf(0)).to.be.equal(altSignerAddress);
+    });
+
+    it("transfers mixtape from one address to another", async () => {
+      await mixtape
+        .connect(altSigner)
+        .transferFrom(altSignerAddress, signerAddress, 0);
+      expect(await mixtape.ownerOf(0)).to.be.equal(signerAddress);
     });
   });
 });
