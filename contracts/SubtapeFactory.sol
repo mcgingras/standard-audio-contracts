@@ -81,7 +81,6 @@ contract SubtapeFactory is
         if (owner() == address(0x0)) {
             return (owner(), 0);
         }
-
         ///  TODO: override royalty from .05 to whatever
         ///  @dev: keep in mind there are no floats in solidity
         return (owner(), ((_salePrice * 5) / 100));

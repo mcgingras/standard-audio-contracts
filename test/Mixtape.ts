@@ -75,7 +75,7 @@ describe("MIXTAPE CONTRACT", function () {
       ).to.emit(mixtape, "Claimed");
     });
   });
-
+  
   describe("Post mint checks", async () => {
     // we want to have a tape to run checks against
     beforeEach(async () => {
@@ -99,7 +99,6 @@ describe("MIXTAPE CONTRACT", function () {
         BigNumber.from(10),
         BigNumber.from(10)
       );
-
       await mixtape.claim(
         0,
         BigNumber.from(10),
@@ -127,6 +126,20 @@ describe("MIXTAPE CONTRACT", function () {
 
     it("is able to mint subtapes", async () => {
       const subtapeFactory = await mixtape.getFactoryAtId(0);
+      const subtapeContract = (await ethers.getContractAt(
+        "SubtapeFactory",
+        subtapeFactory
+      )) as SubtapeFactory;
+
+      await subtapeContract.mintSubtape(signerAddress);
+      expect(await subtapeContract.ownerOf(0)).to.be.equal(signerAddress);
+    });
+
+    // this should not work...
+    // not sure why it is showing a contract address
+    it("Reverts when calling an empty factory...", async () => {
+      // should be empty
+      const subtapeFactory = await mixtape.getFactoryAtId(1);
       const subtapeContract = (await ethers.getContractAt(
         "SubtapeFactory",
         subtapeFactory
@@ -212,6 +225,18 @@ describe("MIXTAPE CONTRACT", function () {
         .connect(altSigner)
         .transferFrom(altSignerAddress, signerAddress, 0);
       expect(await mixtape.ownerOf(0)).to.be.equal(signerAddress);
+     });
+
+
+    it("Withdraws from contract successfully", async () => {
+      const signerBalanceBeforeWithdraw = await signer.getBalance();
+      await mixtape.withdraw();
+      // Some ETH is lost from withdraw contract interaction.
+      expect(
+        (await signer.getBalance())
+          .sub(signerBalanceBeforeWithdraw)
+          .gte(ethers.utils.parseEther("0.09"))
+      ).to.be.true;
     });
   });
 });
