@@ -122,4 +122,18 @@ describe("SUBTAPE FACTORY CONTRACT", function () {
       // not sure you can do this without enumerating, but it would be cool and helpful.
     });
   });
+
+  describe("Royalty info", () => {
+    it("calculates royalty info", async () => {
+      const payout = await subtapeFactoryContract.royaltyInfo(
+        0,
+        ethers.utils.parseEther("1.0")
+      );
+      const toAddress = payout.receiver;
+      const amount = payout.royaltyAmount;
+
+      expect(toAddress).to.equal(signerAddress);
+      expect(amount).to.equal(ethers.utils.parseEther("0.05"));
+    });
+  });
 });
