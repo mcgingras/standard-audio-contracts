@@ -11,7 +11,9 @@ contract SubtapeFactoryCreator {
     using Counters for Counters.Counter;
 
     /// Counter for current contract id upgraded
-    Counters.Counter private contractCount;
+    /// making this public for debugging reasons
+    /// but we can make it private again in a bit
+    Counters.Counter public contractCount;
 
     // the address of the contract we want to clone
     address public implementation;

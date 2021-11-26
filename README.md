@@ -87,3 +87,11 @@ figure out how this royalty stuff works
 make subtapes sellable?
 make subtapes easily transferable
 make subtapes inherit metdata
+
+'''bash
+npx hardhat console --network localhost
+const mixtape = await ethers.getContractFactory("Mixtape");
+const contract = await mixtape.attach("0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0");
+// Now you can call functions of the contract
+await contract.doTheThing();
+'''

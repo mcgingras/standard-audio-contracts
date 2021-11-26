@@ -10,3 +10,4 @@ spotify_api/.env
 secrets.json
 typechain-types
 mnemonic.txt
+deployments/localhost/*

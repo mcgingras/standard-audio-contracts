@@ -26,7 +26,13 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
 
   await deploy("Mixtape", {
     from: deployer,
-    args: [tree.getHexRoot(), BASE_URI, SubtapeFactory],
+    args: [
+      // need to sub this out between testing and main
+      // tree.getHexRoot(),
+      "0x7581d01a4a2487fdf457ac49824d715f080b1caa6212e37571d62411507363c2",
+      BASE_URI,
+      SubtapeFactory,
+    ],
     log: true,
   });
 };
